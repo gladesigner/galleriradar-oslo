@@ -28,7 +28,7 @@ struct Leverandør: TimelineProvider {
     /// Widgeten henter listen selv. Den deler ikke lager med appen, men det er
     /// billig nok: data.json er én fil, og iOS hurtiglagrer den.
     private func hent() async -> Innslag {
-        guard let (raa, _) = try? await URLSession.shared.data(from: Tjeneste.data),
+        guard let (raa, _) = try? await URLSession.shared.data(from: Tjeneste.data(friskt: true)),
               let d = try? JSONDecoder().decode(Datasett.self, from: raa) else {
             return .eksempel
         }

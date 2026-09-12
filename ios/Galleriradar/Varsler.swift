@@ -56,7 +56,7 @@ enum Varsler {
     /// bakgrunnsjobben og når appen åpnes.
     static func seEtterNytt() async -> Int {
         guard påskrudd else { return 0 }
-        guard let (raa, _) = try? await URLSession.shared.data(from: Tjeneste.data),
+        guard let (raa, _) = try? await URLSession.shared.data(from: Tjeneste.data(friskt: true)),
               let d = try? JSONDecoder().decode(Datasett.self, from: raa) else { return 0 }
 
         let iDag = d.iDag

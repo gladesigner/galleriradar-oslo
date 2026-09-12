@@ -3,7 +3,17 @@ import Foundation
 /// Adressen jobben hos GitHub publiserer til. Alt appen viser kommer herfra.
 enum Tjeneste {
     static let grunnadresse = URL(string: "https://gladesigner.github.io/galleriradar-oslo/")!
-    static var data: URL { grunnadresse.appendingPathComponent("data.json") }
+
+    /// GitHub Pages ber nettleseren ta vare på filene en stund. Uten et
+    /// tidsstempel i adressen kan appen bli sittende med gårsdagens liste.
+    static func data(friskt: Bool = false) -> URL {
+        let fil = grunnadresse.appendingPathComponent("data.json")
+        guard var deler = URLComponents(url: fil, resolvingAgainstBaseURL: false) else { return fil }
+        let bolk = friskt ? Int(Date().timeIntervalSince1970)
+                          : Int(Date().timeIntervalSince1970 / 300) * 300
+        deler.queryItems = [URLQueryItem(name: "t", value: String(bolk))]
+        return deler.url ?? fil
+    }
 }
 
 struct Utstilling: Codable, Identifiable, Hashable {

@@ -310,7 +310,7 @@ struct KartVisning: View {
     @EnvironmentObject private var lager: Lager
     @State private var utsnitt = MapCameraPosition.region(
         MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 59.9139, longitude: 10.7400),
-                           span: MKCoordinateSpan(latitudeDelta: 0.075, longitudeDelta: 0.075)))
+                           span: MKCoordinateSpan(latitudeDelta: 0.042, longitudeDelta: 0.042)))
     @State private var valgt: Sted?
 
     var body: some View {
@@ -321,13 +321,16 @@ struct KartVisning: View {
                         Annotation(par.sted.navn,
                                    coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon)) {
                             Button { valgt = par.sted } label: {
-                                Image(systemName: "paintpalette.fill")
-                                    .font(.footnote)
-                                    .padding(7)
+                                Text("\(par.utstillinger.count)")
+                                    .font(.system(size: 11, weight: .bold))
+                                    .frame(width: 22, height: 22)
                                     .background(Color.aksent, in: Circle())
+                                    .overlay(Circle().stroke(.white, lineWidth: 1.5))
                                     .foregroundStyle(.white)
+                                    .shadow(radius: 1.5, y: 1)
                             }
                         }
+                        .annotationTitles(.automatic)
                     }
                 }
             }

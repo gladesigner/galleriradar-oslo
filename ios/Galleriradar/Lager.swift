@@ -40,8 +40,8 @@ final class Lager: ObservableObject {
         laster = true
         defer { laster = false }
         do {
-            var forespørsel = URLRequest(url: Tjeneste.data)
-            forespørsel.cachePolicy = tving ? .reloadIgnoringLocalCacheData : .useProtocolCachePolicy
+            var forespørsel = URLRequest(url: Tjeneste.data(friskt: tving))
+            forespørsel.cachePolicy = .reloadIgnoringLocalCacheData
             let (raa, svar) = try await URLSession.shared.data(for: forespørsel)
             if let http = svar as? HTTPURLResponse, http.statusCode != 200 {
                 throw URLError(.badServerResponse)
