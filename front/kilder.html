@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kilder – Galleriradar Oslo</title>
+<link rel="icon" href="ikon-192.png">
+<link rel="stylesheet" href="stil.css?v=2">
+</head>
+<body>
+<header class="topp">
+  <div class="topp__rad"><h1 class="merke"><a href="./" class="tilbake">←</a> Kilder</h1></div>
+</header>
+<main class="kilder">
+  <p class="kilder__ingress">Én rad per visningssted, med resultatet av siste innhøsting.
+     Står det «ingen treff» over tid, har galleriet trolig lagt om nettsiden – da må
+     velgeren i <code>kilder.py</code> justeres.</p>
+  <table class="tabell">
+    <thead><tr><th>Sted</th><th>Type</th><th class="h">Treff</th><th>Merknad</th></tr></thead>
+    <tbody id="kildekropp"><tr><td colspan="4" class="dempet">Laster …</td></tr></tbody>
+  </table>
+</main>
+<footer class="bunn"><a href="./">← Tilbake til utstillingene</a><span id="bygget" class="dempet"></span></footer>
+<script>
+fetch('data.json?t=' + Date.now()).then((r) => r.json()).then((d) => {
+  const rad = (k) => `
+    <tr class="${k.feil ? 'rad--feil' : (!k.antall ? 'rad--tom' : '')}">
+      <td><a href="${k.url}" target="_blank" rel="noopener">${k.navn}</a></td>
+      <td class="dempet">${k.kategori}</td>
+      <td class="h">${k.antall}</td>
+      <td class="dempet">${k.feil || (k.antall ? '' : 'ingen treff')}</td>
+    </tr>`;
+  document.getElementById('kildekropp').innerHTML = d.kilder.map(rad).join('');
+  document.getElementById('bygget').textContent =
+    'Sist hentet ' + d.bygget.replace('T', ' kl. ').slice(0, 19);
+});
+</script>
+</body>
+</html>

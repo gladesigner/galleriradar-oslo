@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kilder – Galleriradar Oslo</title>
+<link rel="stylesheet" href="/static/stil.css?v=1">
+</head>
+<body>
+<header class="topp">
+  <div class="topp__rad">
+    <h1 class="merke"><a href="/" class="tilbake">←</a> Kilder</h1>
+  </div>
+</header>
+<main class="kilder">
+  <p class="kilder__ingress">Én rad per visningssted, med resultatet av siste innhøsting.
+     Står det «ingen treff» over tid, har galleriet trolig lagt om nettsiden – da må
+     velgeren i <code>kilder.py</code> justeres.</p>
+  <table class="tabell">
+    <thead><tr><th>Sted</th><th>Type</th><th class="h">Treff</th><th>Sist hentet</th><th>Merknad</th></tr></thead>
+    <tbody>
+    {% for k in kilder %}
+      {% set s = status.get(k.id) %}
+      <tr class="{% if s and s.feil %}rad--feil{% elif s and not s.antall %}rad--tom{% endif %}">
+        <td><a href="{{ k.url }}" target="_blank" rel="noopener">{{ k.navn }}</a></td>
+        <td class="dempet">{{ k.kategori }}</td>
+        <td class="h">{{ s.antall if s else '–' }}</td>
+        <td class="dempet">{{ s.tid[:16].replace('T', ' ') if s else 'ikke kjørt' }}</td>
+        <td class="dempet">{{ s.feil if s and s.feil else ('ingen treff' if s and not s.antall else '') }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</main>
+<footer class="bunn"><a href="/">← Tilbake til utstillingene</a></footer>
+</body>
+</html>
