@@ -49,6 +49,8 @@ KILDER: list[dict] = [
         "tittel": ".wp-block-t2-post-title",
         "dato": ".nb-post-subtitle|.nb-post-read-more|.wp-block-t2-post-date",
         "merkelapp": ".nb-post-label",
+        # /tv/ er strømmetjenesten deres, ikke noe som henger på veggen
+        "url_monster": r"nb\.no/(utstilling|hva-skjer)/",
         "maks": 60,
     },
     {
