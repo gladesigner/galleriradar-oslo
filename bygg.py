@@ -81,6 +81,9 @@ def hent_alt(parallelle: int = 6) -> tuple[list[dict], list[dict]]:
             status.append({
                 "id": kilde["id"], "navn": kilde["navn"], "url": kilde["url"],
                 "kategori": kilde.get("kategori", "galleri"),
+                "bydel": kilde.get("bydel", ""),
+                "adresse": kilde.get("adresse", ""),
+                "lat": kilde.get("lat"), "lon": kilde.get("lon"),
                 "antall": len(treff), "feil": feil, "sekunder": brukt,
             })
             merke = "FEIL" if feil else ("tom " if not treff else "ok  ")

@@ -1,0 +1,472 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		23D0416C79FB78063DA75662 /* Lager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD972A721E8F29269363C06 /* Lager.swift */; };
+		4C5F417BC46179E27A3B7171 /* Modell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77488A314CFC63CE435A53A2 /* Modell.swift */; };
+		509DADB9E848A628372979C9 /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C189A7D98D50BA396D408DD /* Widget.swift */; };
+		7273E64BEB8FD4819135FCBF /* GalleriradarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F702BCB3125301717E1F722D /* GalleriradarApp.swift */; };
+		A47B3B24382B02AB574CD226 /* Varsler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E63BB461A0099B9B794576F /* Varsler.swift */; };
+		A9BC1F418B45A21DBAC4ACBD /* Visninger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E999EAFDA217AAC53D61ABE7 /* Visninger.swift */; };
+		B34C79EA3F205129913ABEF9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0046414B61A59B7081E8A92E /* Assets.xcassets */; };
+		BE0A888C99FCCDF9A4BCA1B9 /* GalleriradarWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C21664D70A22BB1E678C1EBA /* GalleriradarWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CB743E88A4FBB48F908A2337 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CA85C0410FE7CE675C9A7664 /* Assets.xcassets */; };
+		E33A441C397B765E71F069F5 /* Modell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77488A314CFC63CE435A53A2 /* Modell.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A82A8D042E3DCDFE54BF7B07 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 35B2682900209A724694EBBB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C154B82A2F1A1DA41CB43C28;
+			remoteInfo = GalleriradarWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		38C04596865194F795C615D1 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BE0A888C99FCCDF9A4BCA1B9 /* GalleriradarWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0046414B61A59B7081E8A92E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0C189A7D98D50BA396D408DD /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
+		0E63BB461A0099B9B794576F /* Varsler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Varsler.swift; sourceTree = "<group>"; };
+		2BDF2422CAA83F6857ED1AB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		4BD972A721E8F29269363C06 /* Lager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lager.swift; sourceTree = "<group>"; };
+		77488A314CFC63CE435A53A2 /* Modell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modell.swift; sourceTree = "<group>"; };
+		C21664D70A22BB1E678C1EBA /* GalleriradarWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = GalleriradarWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA85C0410FE7CE675C9A7664 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D86D851D1BDABE1203969484 /* Galleriradar.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Galleriradar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E999EAFDA217AAC53D61ABE7 /* Visninger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Visninger.swift; sourceTree = "<group>"; };
+		F702BCB3125301717E1F722D /* GalleriradarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleriradarApp.swift; sourceTree = "<group>"; };
+		FFB4435BA80B78A8A67EBC2A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		74688862790F09733ACDE463 /* Galleriradar */ = {
+			isa = PBXGroup;
+			children = (
+				CA85C0410FE7CE675C9A7664 /* Assets.xcassets */,
+				F702BCB3125301717E1F722D /* GalleriradarApp.swift */,
+				2BDF2422CAA83F6857ED1AB1 /* Info.plist */,
+				4BD972A721E8F29269363C06 /* Lager.swift */,
+				77488A314CFC63CE435A53A2 /* Modell.swift */,
+				0E63BB461A0099B9B794576F /* Varsler.swift */,
+				E999EAFDA217AAC53D61ABE7 /* Visninger.swift */,
+			);
+			path = Galleriradar;
+			sourceTree = "<group>";
+		};
+		E2B79658F62BF79C2B0CD5A3 = {
+			isa = PBXGroup;
+			children = (
+				74688862790F09733ACDE463 /* Galleriradar */,
+				E3AE10CCFE59B0538457223D /* GalleriradarWidget */,
+				EF40975B0C8B94FE05F33184 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E3AE10CCFE59B0538457223D /* GalleriradarWidget */ = {
+			isa = PBXGroup;
+			children = (
+				0046414B61A59B7081E8A92E /* Assets.xcassets */,
+				FFB4435BA80B78A8A67EBC2A /* Info.plist */,
+				0C189A7D98D50BA396D408DD /* Widget.swift */,
+			);
+			path = GalleriradarWidget;
+			sourceTree = "<group>";
+		};
+		EF40975B0C8B94FE05F33184 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D86D851D1BDABE1203969484 /* Galleriradar.app */,
+				C21664D70A22BB1E678C1EBA /* GalleriradarWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AE8D6BD287782AA3F64ABEF8 /* Galleriradar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4457362DF4EAC03EA2525351 /* Build configuration list for PBXNativeTarget "Galleriradar" */;
+			buildPhases = (
+				85A5E84C140AF412D3631DA4 /* Sources */,
+				FD0D1302808AEAA8FB5795B9 /* Resources */,
+				38C04596865194F795C615D1 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DBE5206E7302FAE6B7A0A44C /* PBXTargetDependency */,
+			);
+			name = Galleriradar;
+			packageProductDependencies = (
+			);
+			productName = Galleriradar;
+			productReference = D86D851D1BDABE1203969484 /* Galleriradar.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C154B82A2F1A1DA41CB43C28 /* GalleriradarWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 232A1FCE0F3A4027BD4FC47F /* Build configuration list for PBXNativeTarget "GalleriradarWidget" */;
+			buildPhases = (
+				88B74EEBC6CE05709EEC44A6 /* Sources */,
+				1791029B5BD962FF92760917 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GalleriradarWidget;
+			packageProductDependencies = (
+			);
+			productName = GalleriradarWidget;
+			productReference = C21664D70A22BB1E678C1EBA /* GalleriradarWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		35B2682900209A724694EBBB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					AE8D6BD287782AA3F64ABEF8 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					C154B82A2F1A1DA41CB43C28 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 28EDFC748CBCF419EA326887 /* Build configuration list for PBXProject "Galleriradar" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = E2B79658F62BF79C2B0CD5A3;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = EF40975B0C8B94FE05F33184 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AE8D6BD287782AA3F64ABEF8 /* Galleriradar */,
+				C154B82A2F1A1DA41CB43C28 /* GalleriradarWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1791029B5BD962FF92760917 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B34C79EA3F205129913ABEF9 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FD0D1302808AEAA8FB5795B9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CB743E88A4FBB48F908A2337 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		85A5E84C140AF412D3631DA4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7273E64BEB8FD4819135FCBF /* GalleriradarApp.swift in Sources */,
+				23D0416C79FB78063DA75662 /* Lager.swift in Sources */,
+				4C5F417BC46179E27A3B7171 /* Modell.swift in Sources */,
+				A47B3B24382B02AB574CD226 /* Varsler.swift in Sources */,
+				A9BC1F418B45A21DBAC4ACBD /* Visninger.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		88B74EEBC6CE05709EEC44A6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E33A441C397B765E71F069F5 /* Modell.swift in Sources */,
+				509DADB9E848A628372979C9 /* Widget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DBE5206E7302FAE6B7A0A44C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C154B82A2F1A1DA41CB43C28 /* GalleriradarWidget */;
+			targetProxy = A82A8D042E3DCDFE54BF7B07 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1D0FBC8E4120FD0EB63062BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Galleriradar/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Galleriradar;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = no.gladesigner.galleriradar;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4A99C072D53D5D19165F36C9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				INFOPLIST_FILE = GalleriradarWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = no.gladesigner.galleriradar.widget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8409498226BFE62586891EC4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9C96481AE87ECB79F3B6B6B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		F1C30FDBE571F89324BA27C2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				INFOPLIST_FILE = GalleriradarWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = no.gladesigner.galleriradar.widget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F9CD8366FCE5945C40666199 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Galleriradar/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Galleriradar;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = no.gladesigner.galleriradar;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		232A1FCE0F3A4027BD4FC47F /* Build configuration list for PBXNativeTarget "GalleriradarWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4A99C072D53D5D19165F36C9 /* Debug */,
+				F1C30FDBE571F89324BA27C2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		28EDFC748CBCF419EA326887 /* Build configuration list for PBXProject "Galleriradar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8409498226BFE62586891EC4 /* Debug */,
+				9C96481AE87ECB79F3B6B6B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4457362DF4EAC03EA2525351 /* Build configuration list for PBXNativeTarget "Galleriradar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F9CD8366FCE5945C40666199 /* Debug */,
+				1D0FBC8E4120FD0EB63062BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 35B2682900209A724694EBBB /* Project object */;
+}

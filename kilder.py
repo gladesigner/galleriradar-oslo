@@ -25,6 +25,8 @@ KILDER: list[dict] = [
         "url": "https://www.nasjonalmuseet.no/", "bydel": "Vika",
         "type_adapter": "funk", "funksjon": "nasjonalmuseet",
         "detalj_dato": ".event-metadata__text-and-icon span.block|.event-metadata__text-and-icon",
+        "adresse": "Brynjulf Bulls plass 3, 0250 Oslo",
+        "lat": 59.91163, "lon": 10.72842,
     },
     {
         "id": "munch", "navn": "MUNCH", "kategori": "museum", "bydel": "Bjørvika",
@@ -36,6 +38,8 @@ KILDER: list[dict] = [
         "dato": ".ExhibitionCard__intro span|.ExhibitionCard__intro",
         "url_monster": r"/utstillinger/",
         "reserve": True,          # munch.no stenger ute datasentre
+        "adresse": "Edvard Munchs plass 1, 0194 Oslo",
+        "lat": 59.90562, "lon": 10.75516,
     },
     {
         "id": "afmuseet", "navn": "Astrup Fearnley Museet", "kategori": "museum",
@@ -46,6 +50,8 @@ KILDER: list[dict] = [
         "dato": ".wp-block-afm-block-post-dates",
         "merkelapp": ".wp-block-afm-block-post-type",
         "sammendrag": ".t2-post-excerpt",
+        "adresse": "Strandpromenaden 2, 0252 Oslo",
+        "lat": 59.90693, "lon": 10.72194,
     },
     {
         "id": "hok", "navn": "Henie Onstad Kunstsenter", "kategori": "museum",
@@ -56,6 +62,8 @@ KILDER: list[dict] = [
         "kunstnere": "h2",
         "dato": ".f-sm|time|.date",
         "url_monster": r"/utstillinger/",
+        "adresse": "Sonja Henies vei 31, 1311 Høvikodden",
+        "lat": 59.88864, "lon": 10.55349,
     },
     {
         "id": "vigeland", "navn": "Vigeland-museet", "kategori": "museum",
@@ -65,6 +73,8 @@ KILDER: list[dict] = [
         "dato": ".f-sm|time|.date",
         "url_monster": r"/utstillinger/[^/]+$",
         "detalj": True, "tittel_fra_detalj": True, "krev_dato": True,
+        "adresse": "Nobels gate 32, 0268 Oslo",
+        "lat": 59.92312, "lon": 10.70185,
     },
 
     # ─────────────────────── kunsthaller ───────────────────────
@@ -77,6 +87,8 @@ KILDER: list[dict] = [
         "kunstnere": ".LinkItem__head__sub",
         "dato": ".LinkItem__head__sub",
         "merkelapp": ".LinkItem__head__categories",
+        "adresse": "Wergelandsveien 17, 0167 Oslo",
+        "lat": 59.91954, "lon": 10.73079,
     },
     {
         "id": "kunsthalloslo", "navn": "Kunsthall Oslo", "kategori": "kunsthall",
@@ -86,6 +98,8 @@ KILDER: list[dict] = [
         "tittel": ".wp-block-post-title",
         "dato": ".wp-block-post-excerpt|.wp-block-post-date|time",
         "sammendrag": ".wp-block-post-excerpt",
+        "adresse": "Rostockgata 2, 0191 Oslo",
+        "lat": 59.90796, "lon": 10.76152,
     },
     {
         "id": "uks", "navn": "UKS – Unge Kunstneres Samfund", "kategori": "kunsthall",
@@ -94,6 +108,8 @@ KILDER: list[dict] = [
         "tittel": ".column__title",
         "dato": ".column__date|.column--two|.column",
         "kunstnere": ".column__artists|.column__subtitle",
+        "adresse": "Keysers gate 1, 0165 Oslo",
+        "lat": 59.91705, "lon": 10.74385,
     },
     {
         "id": "oslokunstforening", "navn": "Oslo Kunstforening", "kategori": "kunsthall",
@@ -105,6 +121,8 @@ KILDER: list[dict] = [
         "ar_hint": {"foreldre": ".rows", "velger": ""},
         "url_monster": r"/utstillinger/",
         "maks": 80,
+        "adresse": "Rådhusgata 19, 0158 Oslo",
+        "lat": 59.91014, "lon": 10.74033,
     },
     {
         "id": "fotogalleriet", "navn": "Fotogalleriet", "kategori": "kunsthall",
@@ -114,6 +132,8 @@ KILDER: list[dict] = [
         "kunstnere": ".content-inner--title .content-subtitle",
         "dato": ".exhibition-dates|.content-date",
         "merkelapp": ".content-inner--info .content-subtitle",
+        "adresse": "Møllergata 34, 0179 Oslo",
+        "lat": 59.91746, "lon": 10.75026,
     },
     {
         "id": "kunstnerforbundet", "navn": "Kunstnerforbundet", "kategori": "kunsthall",
@@ -125,6 +145,8 @@ KILDER: list[dict] = [
         "dato": ".period",
         "url_monster": r"/utstillinger/",
         "detalj": True, "maks": 60,
+        "adresse": "Kjeld Stubs gate 3, 0160 Oslo",
+        "lat": 59.91286, "lon": 10.73561,
     },
 
     # ──────────────── kommersielle gallerier ────────────────
@@ -137,6 +159,8 @@ KILDER: list[dict] = [
         "dato": ".date|.dates|.caption",
         "url_monster": r"/exhibitions/",
         "krev_dato": True,
+        "adresse": "Eilert Sundts gate 40, 0355 Oslo",
+        "lat": 59.92328, "lon": 10.72051,
     },
     {
         "id": "oslcontemporary", "navn": "OSL contemporary", "kategori": "galleri",
@@ -149,6 +173,8 @@ KILDER: list[dict] = [
         "ar_hint": {"foreldre": "section.waypoint", "velger": "h2|h3|.year"},
         "url_monster": r"/exhibitions/",
         "krev_dato": True,
+        "adresse": "Haxthausens gate 3, 0263 Oslo",
+        "lat": 59.91725, "lon": 10.714,
     },
     {
         "id": "galleririis", "navn": "Galleri Riis", "kategori": "galleri",
@@ -159,6 +185,8 @@ KILDER: list[dict] = [
         "kunstnere": ".exhibition-artists",
         "dato": ".info div",
         "krev_dato": True, "maks": 40,
+        "adresse": "Arbins gate 7, 0253 Oslo",
+        "lat": 59.91454, "lon": 10.72648,
     },
     {
         "id": "semmingsen", "navn": "Galleri Semmingsen", "kategori": "galleri",
@@ -167,6 +195,8 @@ KILDER: list[dict] = [
         "tittel": ".ue-grid-item-title",
         "dato": ".ue-grid-item-title",
         "krev_dato": True, "maks": 20,
+        "adresse": "Niels Juels gate 50, 0257 Oslo",
+        "lat": 59.91754, "lon": 10.71517,
     },
     {
         "id": "format", "navn": "Galleri Format", "kategori": "galleri",
@@ -176,6 +206,8 @@ KILDER: list[dict] = [
         "tittel": "self",
         "dato": ".image-subtitle|p|self",
         "krev_dato": True, "maks": 30,
+        "adresse": "Rådhusgata 24, 0151 Oslo",
+        "lat": 59.90961, "lon": 10.74169,
     },
 
     # ──────────────── kunstnerdrevne og andre ────────────────
@@ -188,6 +220,8 @@ KILDER: list[dict] = [
         "dato": ".query-item-date|p|div",
         "url_monster": r"femtensesse\.no/(project|exhibition)",
         "krev_dato": True, "maks": 30,
+        "adresse": "Bjørn Stallares vei 21, 0574 Oslo",
+        "lat": 59.93278, "lon": 10.78126,
     },
     {
         "id": "ateliernord", "navn": "Atelier Nord", "kategori": "kunstnerdrevet",
@@ -197,6 +231,8 @@ KILDER: list[dict] = [
         "dato": "time|.date",
         "url_monster": r"ateliernord\.no/(?!$|\?|#)[a-z0-9-]{4,}",
         "detalj": True, "krev_dato": True, "maks": 20,
+        "adresse": "Olaf Ryes plass 2, 0552 Oslo",
+        "lat": 59.92227, "lon": 10.75819,
     },
     {
         "id": "norskegrafikere", "navn": "Norske Grafikere", "kategori": "galleri",
@@ -208,6 +244,8 @@ KILDER: list[dict] = [
         "dato": "p",
         "sammendrag": "p:nth-of-type(2)",
         "krev_dato": True, "maks": 40,
+        "adresse": "Tollbugata 24, 0157 Oslo",
+        "lat": 59.91091, "lon": 10.74174,
     },
     {
         "id": "lnm", "navn": "Galleri LNM", "kategori": "galleri",
@@ -219,6 +257,8 @@ KILDER: list[dict] = [
         "dato": "figcaption .body-size",
         "url_monster": r"/utstillinger/",
         "maks": 60,
+        "adresse": "Rådhusgata 37, 0158 Oslo",
+        "lat": 59.91083, "lon": 10.7368,
     },
 ]
 
