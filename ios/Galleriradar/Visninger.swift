@@ -67,6 +67,11 @@ struct ListeVisning: View {
                                 .font(.footnote).foregroundStyle(.secondary)
                                 .listRowSeparator(.hidden)
                         }
+                        if valgt == .fast {
+                            Text("Utstillinger uten oppgitt sluttdato")
+                                .font(.footnote).foregroundStyle(.secondary)
+                                .listRowSeparator(.hidden)
+                        }
                         if valgt == .arrangement {
                             Text("Omvisninger, samtaler og konserter den kommende måneden")
                                 .font(.footnote).foregroundStyle(.secondary)
@@ -87,7 +92,7 @@ struct ListeVisning: View {
                 if fast == nil {
                     ToolbarItem(placement: .principal) {
                         Picker("Visning", selection: $visning) {
-                            ForEach([Lager.Visning.naa, .nytt, .kommer]) { Text($0.rawValue).tag($0) }
+                            ForEach([Lager.Visning.naa, .nytt, .kommer, .fast]) { Text($0.rawValue).tag($0) }
                         }
                         .pickerStyle(.segmented)
                     }

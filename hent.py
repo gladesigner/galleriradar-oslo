@@ -501,6 +501,13 @@ def _rydd(t: dict, kilde: dict) -> dict | None:
         bilde = bilde or d.get("bilde", "")
         sammendrag = sammendrag or d.get("sammendrag", "")
 
+    # «Pågående utstilling» og «Fast utstilling» har bare én dato på siden –
+    # åpningsdagen. Da står den inntil videre, ikke bare den ene dagen.
+    if start and slutt and start == slutt and re.search(
+            r"pågående|fast utstilling|permanent|løpende|ongoing",
+            f"{t.get('merkelapp', '')} {dato_tekst}", re.IGNORECASE):
+        slutt = None
+
     if kilde.get("krev_dato") and not (start or slutt):
         return None
 

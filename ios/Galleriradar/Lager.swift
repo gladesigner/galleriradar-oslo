@@ -81,7 +81,7 @@ final class Lager: ObservableObject {
     // MARK: utvalg
 
     enum Visning: String, CaseIterable, Identifiable {
-        case naa = "Nå", nytt = "Nytt", kommer = "Kommer"
+        case naa = "Nå", nytt = "Nytt", kommer = "Kommer", fast = "Fast"
         case arrangement = "Arrangementer", merket = "Vil se"
         var id: String { rawValue }
     }
@@ -97,12 +97,17 @@ final class Lager: ObservableObject {
 
         switch visning {
         case .naa:
+            // Utstillinger med en siste dag. De som står inntil videre har
+            // sin egen fane – der er det ingenting som haster.
             liste = utstillinger.filter { u in
-                (u.borte ?? false) == false
-                    && (u.sluttDato == nil || u.sluttDato! >= iDag)
+                (u.borte ?? false) == false && u.sluttDato != nil
+                    && u.sluttDato! >= iDag
                     && (u.startDato == nil || u.startDato! <= iDag)
             }
             liste.sort { ($0.sluttDato ?? "9999") < ($1.sluttDato ?? "9999") }
+        case .fast:
+            liste = utstillinger.filter { ($0.borte ?? false) == false && $0.sluttDato == nil }
+            liste.sort { $0.galleri.localizedCaseInsensitiveCompare($1.galleri) == .orderedAscending }
         case .kommer:
             liste = utstillinger.filter { ($0.startDato ?? "") > iDag }
             liste.sort { ($0.startDato ?? "") < ($1.startDato ?? "") }

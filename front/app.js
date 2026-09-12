@@ -72,10 +72,13 @@
         (u) => u.arrangement && u.start_dato && u.start_dato >= i_dag && u.start_dato <= til);
       liste.sort((a, b) => a.start_dato.localeCompare(b.start_dato));
     } else if (visning === 'aktuelt') {
-      liste = liste.filter((u) => !u.borte
-        && (!u.slutt_dato || u.slutt_dato >= i_dag)
+      // bare de som har en siste dag – de faste har sin egen fane
+      liste = liste.filter((u) => !u.borte && u.slutt_dato && u.slutt_dato >= i_dag
         && (!u.start_dato || u.start_dato <= i_dag));
-      liste.sort((a, b) => (a.slutt_dato || '9999').localeCompare(b.slutt_dato || '9999'));
+      liste.sort((a, b) => a.slutt_dato.localeCompare(b.slutt_dato));
+    } else if (visning === 'fast') {
+      liste = liste.filter((u) => !u.borte && !u.slutt_dato);
+      liste.sort((a, b) => a.galleri.localeCompare(b.galleri, 'nb'));
     } else if (visning === 'kommer') {
       liste = liste.filter((u) => u.start_dato && u.start_dato > i_dag);
       liste.sort((a, b) => a.start_dato.localeCompare(b.start_dato));
@@ -106,9 +109,11 @@
   function tell(navn) {
     const i_dag = data.i_dag;
     if (navn === 'aktuelt') {
-      return data.utstillinger.filter((u) => !u.arrangement && !u.borte
-        && (!u.slutt_dato || u.slutt_dato >= i_dag)
-        && (!u.start_dato || u.start_dato <= i_dag)).length;
+      return data.utstillinger.filter((u) => !u.arrangement && !u.borte && u.slutt_dato
+        && u.slutt_dato >= i_dag && (!u.start_dato || u.start_dato <= i_dag)).length;
+    }
+    if (navn === 'fast') {
+      return data.utstillinger.filter((u) => !u.arrangement && !u.borte && !u.slutt_dato).length;
     }
     if (navn === 'kommer') {
       return data.utstillinger.filter((u) => !u.arrangement && u.start_dato > i_dag).length;
@@ -166,7 +171,7 @@
     const banner = visning === 'nytt'
       ? `<div class="beskjed"><span>${liste.length} ${liste.length === 1 ? 'ny utstilling' : 'nye utstillinger'}
            åpnet de siste sju dagene</span></div>` : '';
-    innhold.innerHTML = banner + banner2 + `<div class="rutenett">${liste.map(kort).join('')}</div>`;
+    innhold.innerHTML = banner + banner2 + banner3 + `<div class="rutenett">${liste.map(kort).join('')}</div>`;
   }
 
   function fyllGallerier() {
