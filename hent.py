@@ -70,8 +70,26 @@ def _reservehent(url: str) -> requests.Response:
     return r
 
 
+class Nettlesersvar:
+    """Ser ut som et requests-svar, men innholdet kommer fra en ekte nettleser."""
+
+    def __init__(self, tekst: str, url: str):
+        self.text = tekst
+        self.url = url
+        self.status_code = 200
+
+    @property
+    def content(self) -> bytes:
+        return self.text.encode("utf-8", "replace")
+
+
 def hent_side(url: str, forsok: int = 3, hoder: dict | None = None,
-              reserve: bool = False, bare_reserve: bool = False) -> requests.Response:
+              reserve: bool = False, bare_reserve: bool = False,
+              js: bool | str = False) -> requests.Response | "Nettlesersvar":
+    if js:
+        import nettleser
+        html, endelig = nettleser.hent_html(url, vent_paa=js if isinstance(js, str) else None)
+        return Nettlesersvar(html, endelig)
     if bare_reserve:
         return _reservehent(url)
     siste = None
@@ -132,6 +150,8 @@ def _plukk_dato(rot, velger: str | None) -> str:
     """Første treff som faktisk lar seg tolke som dato – ellers første treff."""
     if not velger:
         return ""
+    if velger == "self":
+        return _tekst(rot)
     forste = ""
     for v in velger.split("|"):
         for el in rot.select(v.strip()):
@@ -150,6 +170,8 @@ def _plukk_ikke_dato(rot, velger: str | None) -> str:
     """Første treff som ikke er en dato – for felt der dato og navn deler klasse."""
     if not velger:
         return ""
+    if velger == "self":
+        return _tekst(rot)
     for v in velger.split("|"):
         for el in rot.select(v.strip()):
             t = _tekst(el)
@@ -249,7 +271,8 @@ def _fra_css(kilde: dict) -> list[dict]:
     monster = re.compile(kilde["url_monster"]) if kilde.get("url_monster") else None
     for url in kilde.get("sider") or [kilde["url"]]:
         r = hent_side(url, hoder=kilde.get("hoder"), reserve=kilde.get("reserve", False),
-                      bare_reserve=kilde.get("_tving_reserve", False))
+                      bare_reserve=kilde.get("_tving_reserve", False),
+                      js=kilde.get("js", False))
         s = _suppe(r)
         rammer = s.select(kilde["element"])
         if kilde.get("underelement"):
@@ -441,7 +464,8 @@ def hent_detalj(url: str, kilde: dict) -> dict:
             return {"dato_tekst": rad[1], "bilde": rad[2], "sammendrag": rad[3], "tittel": rad[4]}
         try:
             r = hent_side(url, forsok=1, hoder=kilde.get("hoder"),
-                          reserve=kilde.get("reserve", False))
+                          reserve=kilde.get("reserve", False),
+                          js=kilde.get("js", False))
         except Hentefeil:
             return {}
         sup = _suppe(r)
@@ -449,11 +473,21 @@ def hent_detalj(url: str, kilde: dict) -> dict:
             tag.decompose()
         dato_tekst = _plukk_dato(sup, kilde.get("detalj_dato") or "") if kilde.get("detalj_dato") else ""
         if not dato_tekst:
-            brodtekst = _tekst(sup.select_one("main") or sup.body or sup)[:2500]
-            for bit in re.split(r"(?<=[.!?»])\s+|\n", brodtekst):
-                if tolk_periode(bit)[0] and len(bit) < 120:
-                    dato_tekst = bit.strip()
+            # Let etter en ekte periode først – «5. september – 12. oktober».
+            # En enkelt dato er som regel publiseringsdatoen, ikke utstillingen.
+            brodtekst = _tekst(sup.select_one("main") or sup.body or sup)[:4000]
+            enkel = ""
+            for bit in re.split(r"(?<=[.!?»])\s+|\n|\|", brodtekst):
+                bit = bit.strip()
+                if len(bit) > 140:
+                    continue
+                start_, slutt_ = tolk_periode(bit)
+                if start_ and slutt_ and start_ != slutt_:
+                    dato_tekst = bit
                     break
+                if start_ and not enkel:
+                    enkel = bit
+            dato_tekst = dato_tekst or enkel
         bilde = ""
         og = sup.find("meta", property="og:image")
         if og and og.get("content", "").strip():
@@ -506,14 +540,20 @@ def _rydd(t: dict, kilde: dict) -> dict | None:
 
     # Detaljsiden hentes når listen mangler noe vi vil ha: datoer, bilde
     # eller tittel. Svaret mellomlagres, så det koster lite.
-    mangler = (not (start or slutt)) or (not bilde) or kilde.get("tittel_fra_detalj")
+    trenger_periode = kilde.get("krev_periode") and not (start and slutt and start != slutt)
+    mangler = (not (start or slutt)) or (not bilde) or trenger_periode \
+        or kilde.get("tittel_fra_detalj")
     if kilde.get("detalj") and url.startswith("http") and mangler:
         d = hent_detalj(url, kilde)
         if kilde.get("tittel_fra_detalj") and d.get("tittel"):
             tittel = d["tittel"].split(" | ")[0].split(" - ")[0].strip() or tittel
         if d.get("dato_tekst"):
-            dato_tekst = _rens(d["dato_tekst"])
-            start, slutt = tolk_periode(dato_tekst, t.get("ar_hint"))
+            ny_start, ny_slutt = tolk_periode(_rens(d["dato_tekst"]), t.get("ar_hint"))
+            # Detaljsiden vinner når den har en ekte periode, eller når listen
+            # ikke ga noen dato i det hele tatt.
+            if (ny_start and ny_slutt and ny_start != ny_slutt) or not (start or slutt):
+                dato_tekst = _rens(d["dato_tekst"])
+                start, slutt = ny_start, ny_slutt
         bilde = bilde or d.get("bilde", "")
         sammendrag = sammendrag or d.get("sammendrag", "")
 
@@ -525,6 +565,10 @@ def _rydd(t: dict, kilde: dict) -> dict | None:
         slutt = None
 
     if kilde.get("krev_dato") and not (start or slutt):
+        return None
+    # Små nettsteder skriver gjerne publiseringsdatoen sin der utstillingen
+    # skulle stått. Krever vi en ekte periode, faller bloggdatoene bort.
+    if kilde.get("krev_periode") and not (start and slutt and start != slutt):
         return None
 
     if start or slutt:                      # klipp datoen av titler som «Sommerutstilling 18.6-16.8.26»

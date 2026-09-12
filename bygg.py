@@ -75,10 +75,16 @@ def hent_alt(parallelle: int = 6) -> tuple[list[dict], list[dict]]:
 
     rader: list[dict] = []
     status: list[dict] = []
-    with ThreadPoolExecutor(parallelle) as ex:
-        for kilde, treff, feil, brukt in ex.map(en, KILDER):
-            rader += treff
-            status.append({
+
+    # Playwright tåler bare én tråd. Sidene som må kjøres i nettleser tas
+    # derfor etter tur, resten parallelt.
+    i_nettleser = [k for k in KILDER if k.get("js")]
+    vanlige = [k for k in KILDER if not k.get("js")]
+
+    def samle(kilde, treff, feil, brukt):
+        nonlocal rader
+        rader += treff
+        status.append({
                 "id": kilde["id"], "navn": kilde["navn"], "url": kilde["url"],
                 "kategori": kilde.get("kategori", "galleri"),
                 "region": kilde.get("region", "oslo"),
@@ -86,9 +92,16 @@ def hent_alt(parallelle: int = 6) -> tuple[list[dict], list[dict]]:
                 "adresse": kilde.get("adresse", ""),
                 "lat": kilde.get("lat"), "lon": kilde.get("lon"),
                 "antall": len(treff), "feil": feil, "sekunder": brukt,
-            })
-            merke = "FEIL" if feil else ("tom " if not treff else "ok  ")
-            print(f"  {merke} {kilde['id']:20} {len(treff):3} treff {brukt:5.1f}s {feil or ''}")
+        })
+        merke = "FEIL" if feil else ("tom " if not treff else "ok  ")
+        print(f"  {merke} {kilde['id']:20} {len(treff):3} treff {brukt:5.1f}s {feil or ''}")
+
+    with ThreadPoolExecutor(parallelle) as ex:
+        for svar in ex.map(en, vanlige):
+            samle(*svar)
+    for kilde in i_nettleser:
+        samle(*en(kilde))
+
     return rader, status
 
 

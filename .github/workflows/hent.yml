@@ -30,6 +30,18 @@ jobs:
 
       - run: pip install -r krav.txt
 
+      # Noen gallerier bygger utstillingslisten i nettleseren. Chromium
+      # mellomlagres, ellers lastes 100 MB ned seks ganger i døgnet.
+      - name: Hent nettleserbufferen
+        id: nettleser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('krav.txt') }}
+
+      - name: Installer Chromium
+        run: python -m playwright install --with-deps chromium
+
       - id: pages
         uses: actions/configure-pages@v5
 

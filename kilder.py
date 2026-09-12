@@ -302,11 +302,12 @@ KILDER: list[dict] = [
         "adresse": "Sjølystveien 8, 4610 Kristiansand",
         "lat": 58.13821, "lon": 7.99715,
         "sider": ["https://www.kunstsilo.no/no/utstillinger"],
+        # Datoene settes inn av JavaScript – siden må kjøres for å se dem.
+        "js": True,
         "element": "a.slide", "lenke": "self",
         "tittel": "h3",
-        "kunstnere": ".tag",
+        "dato": "self",
         "url_monster": r"/utstillinger/",
-        # Kunstsilo oppgir ingen datoer, verken i listen eller på sidene.
         "maks": 30,
     },
     {
@@ -529,6 +530,28 @@ KILDER: list[dict] = [
         "url_monster": r"k-u-k\.no/project/",
         "detalj": True,
         "maks": 20,
+    },
+    {
+        "id": "nitja", "region": "oslo", "navn": "Nitja senter for samtidskunst",
+        "kategori": "kunsthall", "bydel": "Lillestrøm",
+        "url": "https://nitja.no/", "adresse": "Storgata 30, 2000 Lillestrøm",
+        "sider": ["https://nitja.no/current-upcoming"],
+        "js": "main a",
+        "element": "main a[href*='/exhibitions/']", "lenke": "self",
+        "tittel": "h2|h3|self",
+        "dato": "self",
+        "url_monster": r"/exhibitions/.+",
+        "maks": 20,
+    },
+    {
+        "id": "kunsthalldikemark", "region": "oslo", "navn": "Kunsthall Dikemark",
+        "kategori": "kunsthall", "bydel": "Asker",
+        "url": "https://www.kunsthalldikemark.no/",
+        "adresse": "Dikemark, 1385 Asker",
+        "element": "article, .post, .card, .entry",
+        "tittel": "h2|h3|.entry-title",
+        "dato": "time|.date|.entry-date|p|self",
+        "detalj": True, "krev_periode": True, "maks": 15,
     },
 ]
 
