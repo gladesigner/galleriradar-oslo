@@ -147,14 +147,21 @@ final class Lager: ObservableObject {
 
     func antall(_ visning: Visning) -> Int { utstillinger(visning).count }
 
-    /// Stedene som har noe å vise akkurat nå – grunnlaget for kartet.
-    func stederMedProgram() -> [(sted: Sted, utstillinger: [Utstilling])] {
-        let naa = utstillinger(.naa) + utstillinger(.arrangement)
-        return data.kilder
+    /// Alt et sted har på plakaten nå: utstillinger først, så arrangementer.
+    func paaSted(_ kildeId: String) -> (utstillinger: [Utstilling], arrangementer: [Utstilling]) {
+        (utstillinger(.naa, sted: kildeId) + utstillinger(.fast, sted: kildeId),
+         utstillinger(.arrangement, sted: kildeId))
+    }
+
+    /// Stedene som har noe å vise – grunnlaget for kartet. Tallet på nåla er
+    /// summen av det listen under viser, ikke bare utstillingene.
+    func stederMedProgram() -> [(sted: Sted, antall: Int)] {
+        data.kilder
             .filter { $0.harPosisjon }
             .compactMap { s in
-                let mine = naa.filter { $0.kildeId == s.id }
-                return mine.isEmpty ? nil : (s, mine)
+                let p = paaSted(s.id)
+                let n = p.utstillinger.count + p.arrangementer.count
+                return n == 0 ? nil : (s, n)
             }
     }
 }

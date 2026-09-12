@@ -327,9 +327,9 @@ private struct Knappetekst: View {
 private struct Klynge: Identifiable {
     let id: String
     let posisjon: CLLocationCoordinate2D
-    let steder: [(sted: Sted, utstillinger: [Utstilling])]
+    let steder: [(sted: Sted, antall: Int)]
 
-    var antall: Int { steder.reduce(0) { $0 + $1.utstillinger.count } }
+    var antall: Int { steder.reduce(0) { $0 + $1.antall } }
     var eneste: Sted? { steder.count == 1 ? steder[0].sted : nil }
     var navn: String { eneste?.navn ?? "\(steder.count) steder" }
 
@@ -369,7 +369,7 @@ struct KartVisning: View {
         // breddegrad er én grad øst-vest omtrent halvparten så lang.
         let celleLengde = celle * 2
 
-        var bøtter: [String: [(sted: Sted, utstillinger: [Utstilling])]] = [:]
+        var bøtter: [String: [(sted: Sted, antall: Int)]] = [:]
         for par in lager.stederMedProgram() {
             guard let lat = par.sted.lat, let lon = par.sted.lon else { continue }
             let nøkkel = "\(Int((lat / celle).rounded(.down)))_\(Int((lon / celleLengde).rounded(.down)))"
@@ -418,14 +418,41 @@ struct KartVisning: View {
             .navigationBarTitleDisplayMode(.inline)
             .sheet(item: $valgt) { sted in
                 NavigationStack {
-                    List(lager.utstillinger(.naa, sted: sted.id)) { u in
-                        NavigationLink(value: u) { Utstillingsrad(utstilling: u) }
-                    }
-                    .navigationTitle(sted.navn)
-                    .navigationBarTitleDisplayMode(.inline)
-                    .navigationDestination(for: Utstilling.self) { DetaljVisning(utstilling: $0) }
+                    StedsListe(sted: sted)
+                        .navigationTitle(sted.navn)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .navigationDestination(for: Utstilling.self) { DetaljVisning(utstilling: $0) }
                 }
                 .presentationDetents([.medium, .large])
+            }
+        }
+    }
+}
+
+/// Alt som skjer på ett sted: utstillingene øverst, arrangementene under.
+struct StedsListe: View {
+    @EnvironmentObject private var lager: Lager
+    let sted: Sted
+
+    var body: some View {
+        let innhold = lager.paaSted(sted.id)
+        List {
+            if !innhold.utstillinger.isEmpty {
+                Section("Utstillinger") {
+                    ForEach(innhold.utstillinger) { u in
+                        NavigationLink(value: u) { Utstillingsrad(utstilling: u) }
+                    }
+                }
+            }
+            if !innhold.arrangementer.isEmpty {
+                Section("Arrangementer") {
+                    ForEach(innhold.arrangementer) { u in
+                        NavigationLink(value: u) { Utstillingsrad(utstilling: u) }
+                    }
+                }
+            }
+            if innhold.utstillinger.isEmpty && innhold.arrangementer.isEmpty {
+                Text("Ingenting på plakaten akkurat nå.").foregroundStyle(.secondary)
             }
         }
     }
