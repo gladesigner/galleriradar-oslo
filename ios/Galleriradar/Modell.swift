@@ -32,16 +32,22 @@ struct Utstilling: Codable, Identifiable, Hashable {
     let type: String?
     let forsteGang: String
     let borte: Bool?
+    let arrangement: Bool?
 
     var id: String { nokkel }
 
     enum CodingKeys: String, CodingKey {
-        case nokkel, galleri, kategori, tittel, kunstnere, periode, url, bilde, sammendrag, type, borte
+        case nokkel, galleri, kategori, tittel, kunstnere, periode, url, bilde
+        case sammendrag, type, borte, arrangement
         case kildeId = "kilde_id"
         case startDato = "start_dato"
         case sluttDato = "slutt_dato"
         case forsteGang = "forste_gang"
     }
+
+    /// Enkeltarrangementer – omvisninger, samtaler, konserter – skjer på et
+    /// klokkeslett og hører ikke hjemme blant utstillingene.
+    var erArrangement: Bool { arrangement ?? false }
 
     var lenke: URL? { URL(string: url) }
 

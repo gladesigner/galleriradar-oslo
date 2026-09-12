@@ -376,6 +376,25 @@ TYPER = {
 }
 
 
+# Ord som avslører at dette er et enkeltarrangement og ikke en utstilling.
+# Mange gallerier merker ikke slikt selv, men skriver det i tittelen.
+ARRANGEMENTSORD = re.compile(
+    # Norsk setter sammen ord: «Søndagsomvisning» er like mye en omvisning som
+    # «Omvisning», så disse får lov til å ha hva som helst foran seg.
+    r"\w*(?:omvisning|verksted|samtale|konsert|foredrag|lansering|vernissage|"
+    r"filmvisning|opplesning|forestilling|seminar|konferanse|\u00e5pningsfest|kveldsåpent)"
+    r"|\b(?:artist talk|talk|performance|workshop|kurs|quiz|panel|kino|dj|"
+    r"familiedag|barnas|markering|fest|jubileumsfest)\b",
+    re.IGNORECASE)
+
+
+def _er_arrangement(type_: str, tittel: str) -> bool:
+    """Et enkeltarrangement skjer på et klokkeslett, en utstilling står en periode."""
+    if type_ and type_ != "utstilling":
+        return True
+    return bool(ARRANGEMENTSORD.search(tittel))
+
+
 def _type(merkelapp: str, standard: str) -> str:
     t = (merkelapp or standard or "utstilling").strip().lower()
     for ord_ in t.replace("/", " ").split():
@@ -490,6 +509,7 @@ def _rydd(t: dict, kilde: dict) -> dict | None:
         if i is not None and i > 3:
             tittel = re.sub(r"\s+", " ", tittel[:i]).strip(" –—-,:·|") or tittel
     kunstnere = _uten_gjentakelse(_rens(t.get("kunstnere", "")), tittel)
+    mine_type = _type(t.get("merkelapp", ""), kilde.get("type", "utstilling"))
     return {
         "kilde_id": kilde["id"],
         "galleri": kilde["navn"],
@@ -504,7 +524,8 @@ def _rydd(t: dict, kilde: dict) -> dict | None:
         "url": url,
         "bilde": (bilde or "")[:700],
         "sammendrag": sammendrag[:700],
-        "type": _type(t.get("merkelapp", ""), kilde.get("type", "utstilling")),
+        "type": mine_type,
+        "arrangement": _er_arrangement(mine_type, tittel),
         "nokkel": _nokkel(url, tittel),
     }
 

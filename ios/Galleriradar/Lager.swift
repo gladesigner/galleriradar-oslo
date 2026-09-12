@@ -64,7 +64,7 @@ final class Lager: ObservableObject {
     }
 
     func erNy(_ u: Utstilling) -> Bool {
-        guard let start = u.startDato else { return false }
+        guard !u.erArrangement, let start = u.startDato else { return false }
         let iDag = data.iDag.isEmpty ? Dato.tekst(Date()) : data.iDag
         return start >= nyttGrense && start <= iDag
     }
@@ -81,7 +81,8 @@ final class Lager: ObservableObject {
     // MARK: utvalg
 
     enum Visning: String, CaseIterable, Identifiable {
-        case naa = "Nå", nytt = "Nytt", kommer = "Kommer", merket = "Vil se"
+        case naa = "Nå", nytt = "Nytt", kommer = "Kommer"
+        case arrangement = "Arrangementer", merket = "Vil se"
         var id: String { rawValue }
     }
 
@@ -91,20 +92,31 @@ final class Lager: ObservableObject {
         let iDag = data.iDag.isEmpty ? Dato.tekst(Date()) : data.iDag
         var liste: [Utstilling]
 
+        // Utstillingsfanene viser bare utstillinger; arrangementene har sin egen.
+        let utstillinger = data.utstillinger.filter { !$0.erArrangement }
+
         switch visning {
         case .naa:
-            liste = data.utstillinger.filter { u in
+            liste = utstillinger.filter { u in
                 (u.borte ?? false) == false
                     && (u.sluttDato == nil || u.sluttDato! >= iDag)
                     && (u.startDato == nil || u.startDato! <= iDag)
             }
             liste.sort { ($0.sluttDato ?? "9999") < ($1.sluttDato ?? "9999") }
         case .kommer:
-            liste = data.utstillinger.filter { ($0.startDato ?? "") > iDag }
+            liste = utstillinger.filter { ($0.startDato ?? "") > iDag }
+            liste.sort { ($0.startDato ?? "") < ($1.startDato ?? "") }
+        case .arrangement:
+            // Kommende måned, det som skjer først øverst.
+            let om_en_maaned = Dato.tekst(
+                Calendar.current.date(byAdding: .day, value: 31, to: Date()) ?? Date())
+            liste = data.utstillinger.filter {
+                $0.erArrangement && ($0.startDato ?? "") >= iDag && ($0.startDato ?? "") <= om_en_maaned
+            }
             liste.sort { ($0.startDato ?? "") < ($1.startDato ?? "") }
         case .nytt:
             // nettopp åpnet, og fortsatt oppe
-            liste = data.utstillinger.filter { erNy($0) && ($0.sluttDato == nil || $0.sluttDato! >= iDag) }
+            liste = utstillinger.filter { erNy($0) && ($0.sluttDato == nil || $0.sluttDato! >= iDag) }
             liste.sort { ($1.startDato ?? "") < ($0.startDato ?? "") }
         case .merket:
             liste = data.utstillinger.filter { merket.contains($0.nokkel) }
@@ -128,7 +140,7 @@ final class Lager: ObservableObject {
 
     /// Stedene som har noe å vise akkurat nå – grunnlaget for kartet.
     func stederMedProgram() -> [(sted: Sted, utstillinger: [Utstilling])] {
-        let naa = utstillinger(.naa)
+        let naa = utstillinger(.naa) + utstillinger(.arrangement)
         return data.kilder
             .filter { $0.harPosisjon }
             .compactMap { s in

@@ -35,7 +35,8 @@
   const trygg = (s) => (s == null ? '' : String(s)).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  const erNy = (u) => !!u.start_dato && u.start_dato >= nyttGrense() && u.start_dato <= data.i_dag;
+  const erNy = (u) => !u.arrangement && !!u.start_dato
+    && u.start_dato >= nyttGrense() && u.start_dato <= data.i_dag;
 
   function dagerIgjen(u) {
     if (!u.slutt_dato || u.slutt_dato < data.i_dag) return null;
@@ -53,11 +54,24 @@
   }
 
   // ── utvalg ──
+  const omEnMaaned = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 31);
+    const to = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${to(d.getMonth() + 1)}-${to(d.getDate())}`;
+  };
+
   function utvalg() {
     const i_dag = data.i_dag;
-    let liste = data.utstillinger;
+    // Utstillingsfanene viser bare utstillinger; arrangementene har sin egen.
+    let liste = data.utstillinger.filter((u) => !u.arrangement);
 
-    if (visning === 'aktuelt') {
+    if (visning === 'arrangement') {
+      const til = omEnMaaned();
+      liste = data.utstillinger.filter(
+        (u) => u.arrangement && u.start_dato && u.start_dato >= i_dag && u.start_dato <= til);
+      liste.sort((a, b) => a.start_dato.localeCompare(b.start_dato));
+    } else if (visning === 'aktuelt') {
       liste = liste.filter((u) => !u.borte
         && (!u.slutt_dato || u.slutt_dato >= i_dag)
         && (!u.start_dato || u.start_dato <= i_dag));
@@ -71,7 +85,7 @@
       liste.sort((a, b) => b.start_dato.localeCompare(a.start_dato));
     } else if (visning === 'merket') {
       const m = merker();
-      liste = liste.filter((u) => m.includes(u.nokkel));
+      liste = data.utstillinger.filter((u) => m.includes(u.nokkel));
       liste.sort((a, b) => (a.slutt_dato || '9999').localeCompare(b.slutt_dato || '9999'));
     } else if (visning === 'tidligere') {
       liste = liste.filter((u) => u.slutt_dato && u.slutt_dato < i_dag);
@@ -92,11 +106,18 @@
   function tell(navn) {
     const i_dag = data.i_dag;
     if (navn === 'aktuelt') {
-      return data.utstillinger.filter((u) => !u.borte
+      return data.utstillinger.filter((u) => !u.arrangement && !u.borte
         && (!u.slutt_dato || u.slutt_dato >= i_dag)
         && (!u.start_dato || u.start_dato <= i_dag)).length;
     }
-    if (navn === 'kommer') return data.utstillinger.filter((u) => u.start_dato > i_dag).length;
+    if (navn === 'kommer') {
+      return data.utstillinger.filter((u) => !u.arrangement && u.start_dato > i_dag).length;
+    }
+    if (navn === 'arrangement') {
+      const til = omEnMaaned();
+      return data.utstillinger.filter(
+        (u) => u.arrangement && u.start_dato >= i_dag && u.start_dato <= til).length;
+    }
     if (navn === 'merket') return merker().length;
     return 0;
   }
@@ -137,13 +158,15 @@
     if (!liste.length) {
       innhold.innerHTML = visning === 'nytt'
         ? '<p class="tomt">Ingen utstillinger har åpnet de siste sju dagene.</p>'
-        : '<p class="tomt">Ingenting her akkurat nå.</p>';
+        : visning === 'arrangement'
+          ? '<p class="tomt">Ingenting står på programmet den kommende måneden.</p>'
+          : '<p class="tomt">Ingenting her akkurat nå.</p>';
       return;
     }
     const banner = visning === 'nytt'
       ? `<div class="beskjed"><span>${liste.length} ${liste.length === 1 ? 'ny utstilling' : 'nye utstillinger'}
            åpnet de siste sju dagene</span></div>` : '';
-    innhold.innerHTML = banner + `<div class="rutenett">${liste.map(kort).join('')}</div>`;
+    innhold.innerHTML = banner + banner2 + `<div class="rutenett">${liste.map(kort).join('')}</div>`;
   }
 
   function fyllGallerier() {

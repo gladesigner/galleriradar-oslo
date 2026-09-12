@@ -28,6 +28,9 @@ struct Hovedvisning: View {
                 .tabItem { Label("Utstillinger", systemImage: "square.grid.2x2") }
                 .badge(lager.antall(.nytt))
 
+            ListeVisning(fast: .arrangement)
+                .tabItem { Label("Program", systemImage: "calendar") }
+
             KartVisning()
                 .tabItem { Label("Kart", systemImage: "map") }
 
@@ -61,6 +64,11 @@ struct ListeVisning: View {
                     List {
                         if valgt == .nytt {
                             Text("Åpnet de siste sju dagene")
+                                .font(.footnote).foregroundStyle(.secondary)
+                                .listRowSeparator(.hidden)
+                        }
+                        if valgt == .arrangement {
+                            Text("Omvisninger, samtaler og konserter den kommende måneden")
                                 .font(.footnote).foregroundStyle(.secondary)
                                 .listRowSeparator(.hidden)
                         }
@@ -98,13 +106,17 @@ private struct Tomtrom: View {
             ProgressView("Henter utstillinger …")
         } else {
             ContentUnavailableView(
-                visning == .nytt ? "Ingenting nytt" : "Ingen utstillinger",
-                systemImage: visning == .merket ? "star" : "paintpalette",
+                visning == .nytt ? "Ingenting nytt"
+                    : visning == .arrangement ? "Ingen arrangementer" : "Ingen utstillinger",
+                systemImage: visning == .merket ? "star"
+                    : visning == .arrangement ? "calendar" : "paintpalette",
                 description: Text(visning == .nytt
                     ? "Ingen utstillinger har åpnet de siste sju dagene."
-                    : visning == .merket
-                        ? "Trykk stjerna på en utstilling for å samle den her."
-                        : "Dra ned for å hente på nytt."))
+                    : visning == .arrangement
+                        ? "Ingenting står på programmet den kommende måneden."
+                        : visning == .merket
+                            ? "Trykk stjerna på en utstilling for å samle den her."
+                            : "Dra ned for å hente på nytt."))
         }
     }
 }
@@ -129,7 +141,7 @@ struct Utstillingsrad: View {
                 }
                 HStack(spacing: 6) {
                     Text(utstilling.periode ?? "").font(.caption).foregroundStyle(.secondary)
-                    if let d = utstilling.dagerIgjen(), d <= 7 {
+                    if !utstilling.erArrangement, let d = utstilling.dagerIgjen(), d <= 7 {
                         Text(d == 0 ? "Siste dag" : d == 1 ? "Siste dag i morgen" : "\(d) dager igjen")
                             .font(.caption.weight(.semibold)).foregroundStyle(Color.aksent)
                     }
