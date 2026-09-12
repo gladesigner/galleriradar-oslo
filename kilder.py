@@ -35,6 +35,7 @@ KILDER: list[dict] = [
         "kunstnere": ".ExhibitionCard__title",
         "dato": ".ExhibitionCard__intro span|.ExhibitionCard__intro",
         "url_monster": r"/utstillinger/",
+        "reserve": True,          # munch.no stenger ute datasentre
     },
     {
         "id": "afmuseet", "navn": "Astrup Fearnley Museet", "kategori": "museum",

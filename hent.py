@@ -31,7 +31,6 @@ HODER = {
                    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
     "Accept-Language": "nb-NO,nb;q=0.9,no;q=0.8,en;q=0.7",
-    "Accept-Encoding": "gzip, deflate, br",
     "Connection": "keep-alive",
     "Upgrade-Insecure-Requests": "1",
     # Noen nettsteder slipper bare gjennom forespørsler som ser ut som en ekte
@@ -49,7 +48,23 @@ class Hentefeil(Exception):
     pass
 
 
-def hent_side(url: str, forsok: int = 3, hoder: dict | None = None) -> requests.Response:
+# Enkelte nettsteder slipper ikke inn forespørsler fra datasentre – da får
+# GitHub-jobben 403 selv om det samme virker fint hjemmefra. For de kildene
+# hentes siden om igjen gjennom en lesetjeneste som svarer med rå HTML.
+RESERVEVEI = "https://r.jina.ai/{}"
+
+
+def _reservehent(url: str) -> requests.Response:
+    # Lesetjenesten vil ha en enkel forespørsel – nettleserhodene våre gir 403 der.
+    r = requests.get(RESERVEVEI.format(url),
+                     headers={"X-Return-Format": "html", "Accept": "*/*"}, timeout=60)
+    r.raise_for_status()
+    r.url = url          # så relative lenker fortsatt peker til galleriet selv
+    return r
+
+
+def hent_side(url: str, forsok: int = 3, hoder: dict | None = None,
+              reserve: bool = False) -> requests.Response:
     siste = None
     for n in range(forsok):
         try:
@@ -65,6 +80,11 @@ def hent_side(url: str, forsok: int = 3, hoder: dict | None = None) -> requests.
             siste = e
             if n + 1 < forsok:
                 time.sleep(1.5)
+    if reserve:
+        try:
+            return _reservehent(url)
+        except Exception as e:            # noqa: BLE001 – da er begge veier prøvd
+            raise Hentefeil(f"{type(siste).__name__}: {siste} (reservevei: {e})") from e
     raise Hentefeil(f"{type(siste).__name__}: {siste}")
 
 
@@ -175,7 +195,7 @@ def _fra_css(kilde: dict) -> list[dict]:
     treff: list[dict] = []
     monster = re.compile(kilde["url_monster"]) if kilde.get("url_monster") else None
     for url in kilde.get("sider") or [kilde["url"]]:
-        r = hent_side(url, hoder=kilde.get("hoder"))
+        r = hent_side(url, hoder=kilde.get("hoder"), reserve=kilde.get("reserve", False))
         s = _suppe(r)
         rammer = s.select(kilde["element"])
         if kilde.get("underelement"):
@@ -346,7 +366,8 @@ def hent_detalj(url: str, kilde: dict) -> dict:
         if rad and time.time() - rad[0] < levetid:
             return {"dato_tekst": rad[1], "bilde": rad[2], "sammendrag": rad[3], "tittel": rad[4]}
         try:
-            r = hent_side(url, forsok=1, hoder=kilde.get("hoder"))
+            r = hent_side(url, forsok=1, hoder=kilde.get("hoder"),
+                          reserve=kilde.get("reserve", False))
         except Hentefeil:
             return {}
         sup = _suppe(r)
