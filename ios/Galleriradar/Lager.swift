@@ -9,6 +9,8 @@ final class Lager: ObservableObject {
     @Published private(set) var laster = false
     @Published private(set) var feil: String?
     @Published var merket: Set<String> = []
+    /// Stedene brukeren har huket bort. Tomt betyr at alt er med.
+    @Published var avKilder: Set<String> = []
 
     private let arkiv: URL = {
         let mappe = FileManager.default.urls(for: .applicationSupportDirectory,
@@ -19,6 +21,7 @@ final class Lager: ObservableObject {
 
     init() {
         merket = Set(UserDefaults.standard.stringArray(forKey: "merket") ?? [])
+        avKilder = Set(UserDefaults.standard.stringArray(forKey: "avKilder") ?? [])
         lesFraDisk()
     }
 
@@ -78,6 +81,27 @@ final class Lager: ObservableObject {
 
     func erMerket(_ u: Utstilling) -> Bool { merket.contains(u.nokkel) }
 
+    // MARK: hvilke steder som skal telle med
+
+    func erPaa(_ kildeId: String) -> Bool { !avKilder.contains(kildeId) }
+
+    func veksleKilde(_ kildeId: String) {
+        if avKilder.contains(kildeId) { avKilder.remove(kildeId) } else { avKilder.insert(kildeId) }
+        UserDefaults.standard.set(Array(avKilder), forKey: "avKilder")
+    }
+
+    func settRegion(_ region: String, pa: Bool) {
+        for s in data.stederIRegion(region) {
+            if pa { avKilder.remove(s.id) } else { avKilder.insert(s.id) }
+        }
+        UserDefaults.standard.set(Array(avKilder), forKey: "avKilder")
+    }
+
+    func regionErPaa(_ region: String) -> Bool {
+        let steder = data.stederIRegion(region)
+        return !steder.isEmpty && steder.allSatisfy { erPaa($0.id) }
+    }
+
     // MARK: utvalg
 
     enum Visning: String, CaseIterable, Identifiable {
@@ -92,8 +116,10 @@ final class Lager: ObservableObject {
         let iDag = data.iDag.isEmpty ? Dato.tekst(Date()) : data.iDag
         var liste: [Utstilling]
 
+        // Steder brukeren har huket bort skal ikke dukke opp noe sted.
+        let valgte = data.utstillinger.filter { erPaa($0.kildeId) }
         // Utstillingsfanene viser bare utstillinger; arrangementene har sin egen.
-        let utstillinger = data.utstillinger.filter { !$0.erArrangement }
+        let utstillinger = valgte.filter { !$0.erArrangement }
 
         switch visning {
         case .naa:
@@ -119,7 +145,7 @@ final class Lager: ObservableObject {
             // Kommende måned, det som skjer først øverst.
             let om_en_maaned = Dato.tekst(
                 Calendar.current.date(byAdding: .day, value: 31, to: Date()) ?? Date())
-            liste = data.utstillinger.filter {
+            liste = valgte.filter {
                 $0.erArrangement && ($0.startDato ?? "") >= iDag && ($0.startDato ?? "") <= om_en_maaned
             }
             liste.sort { ($0.startDato ?? "") < ($1.startDato ?? "") }
@@ -128,7 +154,7 @@ final class Lager: ObservableObject {
             liste = utstillinger.filter { erNy($0) && ($0.sluttDato == nil || $0.sluttDato! >= iDag) }
             liste.sort { ($1.startDato ?? "") < ($0.startDato ?? "") }
         case .merket:
-            liste = data.utstillinger.filter { merket.contains($0.nokkel) }
+            liste = data.utstillinger.filter { merket.contains($0.nokkel) }   // merkede vises alltid
             liste.sort { ($0.sluttDato ?? "9999") < ($1.sluttDato ?? "9999") }
         }
 
@@ -157,7 +183,7 @@ final class Lager: ObservableObject {
     /// summen av det listen under viser, ikke bare utstillingene.
     func stederMedProgram() -> [(sted: Sted, antall: Int)] {
         data.kilder
-            .filter { $0.harPosisjon }
+            .filter { $0.harPosisjon && erPaa($0.id) }
             .compactMap { s in
                 let p = paaSted(s.id)
                 let n = p.utstillinger.count + p.arrangementer.count

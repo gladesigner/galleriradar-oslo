@@ -84,6 +84,10 @@ def hent_side(url: str, forsok: int = 3, hoder: dict | None = None,
                     time.sleep(3)
                     continue
             r.raise_for_status()
+            # Uten charset i svaret gjetter requests på latin-1, og norske
+            # bokstaver blir til «GjerdelÃ¸a». La innholdet bestemme.
+            if not r.encoding or r.encoding.lower() in ("iso-8859-1", "latin-1"):
+                r.encoding = r.apparent_encoding or "utf-8"
             return r
         except Exception as e:          # noqa: BLE001 – vi vil ha alle feil som Hentefeil
             siste = e

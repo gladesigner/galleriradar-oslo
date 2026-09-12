@@ -81,6 +81,7 @@ struct Sted: Codable, Identifiable, Hashable {
     let navn: String
     let url: String
     let kategori: String?
+    let region: String?
     let bydel: String?
     let adresse: String?
     let lat: Double?
@@ -97,13 +98,26 @@ struct Datasett: Codable {
     let antall: Int
     let kilder: [Sted]
     let utstillinger: [Utstilling]
+    let regioner: [String: String]?
 
     enum CodingKeys: String, CodingKey {
-        case bygget, antall, kilder, utstillinger
+        case bygget, antall, kilder, utstillinger, regioner
         case iDag = "i_dag"
     }
 
-    static let tom = Datasett(bygget: "", iDag: "", antall: 0, kilder: [], utstillinger: [])
+    static let tom = Datasett(bygget: "", iDag: "", antall: 0, kilder: [],
+                              utstillinger: [], regioner: nil)
+
+    /// Regionene i rekkefølgen de skal stå i en liste – sørfra og nordover.
+    static let regionrekke = ["oslo", "sorlandet", "vestlandet", "midt",
+                              "nordland", "troms", "finnmark"]
+
+    func regionNavn(_ id: String) -> String { regioner?[id] ?? id }
+
+    func stederIRegion(_ id: String) -> [Sted] {
+        kilder.filter { ($0.region ?? "oslo") == id }
+            .sorted { $0.navn.localizedCaseInsensitiveCompare($1.navn) == .orderedAscending }
+    }
 }
 
 /// Datoene i data.json er rene ISO-datoer uten tidssone.

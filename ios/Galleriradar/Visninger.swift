@@ -21,23 +21,40 @@ extension Color {
 
 struct Hovedvisning: View {
     @EnvironmentObject private var lager: Lager
+    @State private var fane = 0
+    /// Byttes ut hver gang man trykker på utstillingsfanen, slik at listen
+    /// bygges opp på nytt: tilbake til Nå, tomt søk og øverst på siden.
+    @State private var listenokkel = UUID()
+
+    private var valgtFane: Binding<Int> {
+        Binding(get: { fane }, set: { ny in
+            if ny == 0 { listenokkel = UUID() }
+            fane = ny
+        })
+    }
 
     var body: some View {
-        TabView {
+        TabView(selection: valgtFane) {
             ListeVisning()
+                .id(listenokkel)
+                .tag(0)
                 .tabItem { Label("Utstillinger", systemImage: "square.grid.2x2") }
                 .badge(lager.antall(.nytt))
 
             ListeVisning(fast: .arrangement)
+                .tag(1)
                 .tabItem { Label("Arrangement", systemImage: "calendar") }
 
             KartVisning()
+                .tag(2)
                 .tabItem { Label("Kart", systemImage: "map") }
 
             ListeVisning(fast: .merket)
+                .tag(3)
                 .tabItem { Label("Vil se", systemImage: "star") }
 
             OmVisning()
+                .tag(4)
                 .tabItem { Label("Om", systemImage: "info.circle") }
         }
         .tint(.aksent)
@@ -488,23 +505,37 @@ struct OmVisning: View {
                         .foregroundStyle(Color.aksent)
                 }
 
-                Section("Kilder") {
-                    ForEach(lager.data.kilder) { s in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(s.navn)
-                                if let a = s.adresse, !a.isEmpty {
-                                    Text(a).font(.caption).foregroundStyle(.secondary)
+                // Huk av stedene dere vil følge. Alt er med til dere sier noe annet.
+                ForEach(Datasett.regionrekke.filter { !lager.data.stederIRegion($0).isEmpty },
+                        id: \.self) { region in
+                    Section {
+                        ForEach(lager.data.stederIRegion(region)) { sted in
+                            Toggle(isOn: Binding(
+                                get: { lager.erPaa(sted.id) },
+                                set: { _ in lager.veksleKilde(sted.id) })) {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(sted.navn)
+                                        HStack(spacing: 6) {
+                                            if let a = sted.adresse, !a.isEmpty {
+                                                Text(a).lineLimit(1)
+                                            }
+                                            if sted.feil != nil || sted.antall == 0 {
+                                                Text("henter ingenting nå").foregroundStyle(.orange)
+                                            }
+                                        }
+                                        .font(.caption).foregroundStyle(.secondary)
+                                    }
                                 }
-                            }
+                                .tint(.aksent)
+                        }
+                    } header: {
+                        HStack {
+                            Text(lager.data.regionNavn(region))
                             Spacer()
-                            if s.feil != nil || s.antall == 0 {
-                                Image(systemName: "exclamationmark.triangle")
-                                    .foregroundStyle(.orange)
-                            } else {
-                                Text("\(s.antall)").foregroundStyle(.secondary)
-                                    .monospacedDigit()
+                            Button(lager.regionErPaa(region) ? "Skru av alle" : "Skru på alle") {
+                                lager.settRegion(region, pa: !lager.regionErPaa(region))
                             }
+                            .font(.caption).textCase(nil).foregroundStyle(Color.aksent)
                         }
                     }
                 }
