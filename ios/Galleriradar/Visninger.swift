@@ -522,35 +522,48 @@ struct OmVisning: View {
                 // Huk av stedene dere vil følge. Alt er med til dere sier noe annet.
                 ForEach(Datasett.regionrekke.filter { !lager.data.stederIRegion($0).isEmpty },
                         id: \.self) { region in
+                    let steder = lager.data.stederIRegion(region)
+                    let paa = steder.filter { lager.erPaa($0.id) }.count
                     Section {
-                        ForEach(lager.data.stederIRegion(region)) { sted in
-                            Toggle(isOn: Binding(
-                                get: { lager.erPaa(sted.id) },
-                                set: { _ in lager.veksleKilde(sted.id) })) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(sted.navn)
-                                        HStack(spacing: 6) {
-                                            if let a = sted.adresse, !a.isEmpty {
-                                                Text(a).lineLimit(1)
-                                            }
-                                            if sted.feil != nil || sted.antall == 0 {
-                                                Text("henter ingenting nå").foregroundStyle(.orange)
-                                            }
-                                        }
+                        // Hele regionen i én bevegelse.
+                        Toggle(isOn: Binding(
+                            get: { paa > 0 },
+                            set: { lager.settRegion(region, pa: $0) })) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Hele \(lager.data.regionNavn(region))")
+                                        .fontWeight(.semibold)
+                                    Text(paa == steder.count
+                                         ? (steder.count == 1 ? "1 sted" : "\(steder.count) steder")
+                                         : "\(paa) av \(steder.count) steder")
                                         .font(.caption).foregroundStyle(.secondary)
-                                    }
                                 }
-                                .tint(.aksent)
-                        }
-                    } header: {
-                        HStack {
-                            Text(lager.data.regionNavn(region))
-                            Spacer()
-                            Button(lager.regionErPaa(region) ? "Skru av alle" : "Skru på alle") {
-                                lager.settRegion(region, pa: !lager.regionErPaa(region))
                             }
-                            .font(.caption).textCase(nil).foregroundStyle(Color.aksent)
+                            .tint(.aksent)
+
+                        DisclosureGroup("Velg enkeltsteder") {
+                            ForEach(steder) { sted in
+                                Toggle(isOn: Binding(
+                                    get: { lager.erPaa(sted.id) },
+                                    set: { _ in lager.veksleKilde(sted.id) })) {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(sted.navn)
+                                            HStack(spacing: 6) {
+                                                if let a = sted.adresse, !a.isEmpty {
+                                                    Text(a).lineLimit(1)
+                                                }
+                                                if sted.feil != nil || sted.antall == 0 {
+                                                    Text("henter ingenting nå").foregroundStyle(.orange)
+                                                }
+                                            }
+                                            .font(.caption).foregroundStyle(.secondary)
+                                        }
+                                    }
+                                    .tint(.aksent)
+                            }
                         }
+                        .tint(.aksent)
+                    } header: {
+                        Text(lager.data.regionNavn(region))
                     }
                 }
 
