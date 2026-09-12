@@ -72,12 +72,15 @@
         (u) => u.arrangement && u.start_dato && u.start_dato >= i_dag && u.start_dato <= til);
       liste.sort((a, b) => a.start_dato.localeCompare(b.start_dato));
     } else if (visning === 'aktuelt') {
-      // bare de som har en siste dag – de faste har sin egen fane
-      liste = liste.filter((u) => !u.borte && u.slutt_dato && u.slutt_dato >= i_dag
+      // har åpnet og ikke stengt. Mangler sluttdato, men har åpnet? Da går
+      // den fortsatt – den er ikke permanent.
+      liste = liste.filter((u) => !u.borte && (u.start_dato || u.slutt_dato)
+        && (!u.slutt_dato || u.slutt_dato >= i_dag)
         && (!u.start_dato || u.start_dato <= i_dag));
-      liste.sort((a, b) => a.slutt_dato.localeCompare(b.slutt_dato));
+      liste.sort((a, b) => (a.slutt_dato || '9999').localeCompare(b.slutt_dato || '9999'));
     } else if (visning === 'fast') {
-      liste = liste.filter((u) => !u.borte && !u.slutt_dato);
+      // permanent = ingen datoer i det hele tatt
+      liste = liste.filter((u) => !u.borte && !u.start_dato && !u.slutt_dato);
       liste.sort((a, b) => a.galleri.localeCompare(b.galleri, 'nb'));
     } else if (visning === 'kommer') {
       liste = liste.filter((u) => u.start_dato && u.start_dato > i_dag);
@@ -109,11 +112,14 @@
   function tell(navn) {
     const i_dag = data.i_dag;
     if (navn === 'aktuelt') {
-      return data.utstillinger.filter((u) => !u.arrangement && !u.borte && u.slutt_dato
-        && u.slutt_dato >= i_dag && (!u.start_dato || u.start_dato <= i_dag)).length;
+      return data.utstillinger.filter((u) => !u.arrangement && !u.borte
+        && (u.start_dato || u.slutt_dato)
+        && (!u.slutt_dato || u.slutt_dato >= i_dag)
+        && (!u.start_dato || u.start_dato <= i_dag)).length;
     }
     if (navn === 'fast') {
-      return data.utstillinger.filter((u) => !u.arrangement && !u.borte && !u.slutt_dato).length;
+      return data.utstillinger.filter(
+        (u) => !u.arrangement && !u.borte && !u.start_dato && !u.slutt_dato).length;
     }
     if (navn === 'kommer') {
       return data.utstillinger.filter((u) => !u.arrangement && u.start_dato > i_dag).length;

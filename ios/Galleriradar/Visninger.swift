@@ -29,7 +29,7 @@ struct Hovedvisning: View {
                 .badge(lager.antall(.nytt))
 
             ListeVisning(fast: .arrangement)
-                .tabItem { Label("Program", systemImage: "calendar") }
+                .tabItem { Label("Arrangement", systemImage: "calendar") }
 
             KartVisning()
                 .tabItem { Label("Kart", systemImage: "map") }
@@ -68,7 +68,7 @@ struct ListeVisning: View {
                                 .listRowSeparator(.hidden)
                         }
                         if valgt == .fast {
-                            Text("Utstillinger uten oppgitt sluttdato")
+                            Text("Utstillinger uten datoer – står inntil videre")
                                 .font(.footnote).foregroundStyle(.secondary)
                                 .listRowSeparator(.hidden)
                         }

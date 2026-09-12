@@ -81,7 +81,7 @@ final class Lager: ObservableObject {
     // MARK: utvalg
 
     enum Visning: String, CaseIterable, Identifiable {
-        case naa = "Nå", nytt = "Nytt", kommer = "Kommer", fast = "Fast"
+        case naa = "Nå", nytt = "Nytt", kommer = "Kommer", fast = "Permanent"
         case arrangement = "Arrangementer", merket = "Vil se"
         var id: String { rawValue }
     }
@@ -97,16 +97,20 @@ final class Lager: ObservableObject {
 
         switch visning {
         case .naa:
-            // Utstillinger med en siste dag. De som står inntil videre har
-            // sin egen fane – der er det ingenting som haster.
+            // Har åpnet og ikke stengt. En utstilling som mangler sluttdato,
+            // men har åpnet, går fortsatt – den er ikke permanent.
             liste = utstillinger.filter { u in
-                (u.borte ?? false) == false && u.sluttDato != nil
-                    && u.sluttDato! >= iDag
+                (u.borte ?? false) == false
+                    && (u.startDato != nil || u.sluttDato != nil)
+                    && (u.sluttDato == nil || u.sluttDato! >= iDag)
                     && (u.startDato == nil || u.startDato! <= iDag)
             }
             liste.sort { ($0.sluttDato ?? "9999") < ($1.sluttDato ?? "9999") }
         case .fast:
-            liste = utstillinger.filter { ($0.borte ?? false) == false && $0.sluttDato == nil }
+            // Permanent er de som ikke har datoer i det hele tatt.
+            liste = utstillinger.filter {
+                ($0.borte ?? false) == false && $0.startDato == nil && $0.sluttDato == nil
+            }
             liste.sort { $0.galleri.localizedCaseInsensitiveCompare($1.galleri) == .orderedAscending }
         case .kommer:
             liste = utstillinger.filter { ($0.startDato ?? "") > iDag }
