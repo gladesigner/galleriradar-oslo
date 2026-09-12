@@ -88,13 +88,18 @@ def hent_alt(parallelle: int = 6) -> tuple[list[dict], list[dict]]:
     return rader, status
 
 
-def flett(ferske: list[dict], forrige: dict) -> tuple[list[dict], list[dict]]:
+def flett(ferske: list[dict], forrige: dict,
+          status: list[dict] | None = None) -> tuple[list[dict], list[dict]]:
     """Setter sammen nytt og kjent. Returnerer (alle rader, nye rader)."""
     kjent = {u["nokkel"]: u for u in forrige.get("utstillinger", [])}
     forste_kjoring = not kjent
     na = _na()
     i_dag = date.today()
     grense = (i_dag - timedelta(days=BEHOLD_DAGER)).isoformat()
+
+    # Kilder som feilet denne gangen sier ingenting om hva som fortsatt henger.
+    # Utstillingene deres får stå som de sto, i stedet for å bli meldt avsluttet.
+    stumme = {k["id"] for k in (status or []) if k.get("feil") or not k.get("antall")}
 
     ut: dict[str, dict] = {}
     nye: list[dict] = []
@@ -116,7 +121,7 @@ def flett(ferske: list[dict], forrige: dict) -> tuple[list[dict], list[dict]]:
         if (gammel.get("slutt_dato") or gammel.get("start_dato") or "9999") < grense:
             continue
         gammel = dict(gammel)
-        gammel["borte"] = True
+        gammel["borte"] = gammel.get("borte", False) if gammel.get("kilde_id") in stumme else True
         ut[nokkel] = gammel
 
     rader = sorted(ut.values(), key=lambda u: (u.get("slutt_dato") or "9999", u["galleri"]))
@@ -189,7 +194,7 @@ def bygg(utmappe: str, forrige_peker: str | None, side_url: str, emne: str | Non
     print(f"Bygger Galleriradar → {utmappe}")
     forrige = les_forrige(forrige_peker)
     ferske, status = hent_alt()
-    rader, nye = flett(ferske, forrige)
+    rader, nye = flett(ferske, forrige, status)
 
     os.makedirs(utmappe, exist_ok=True)
     for navn in os.listdir(FRONT):
