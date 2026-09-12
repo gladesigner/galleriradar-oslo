@@ -15,13 +15,23 @@ Nye gallerier legges til ved å skrive en ny ordbok her. Test med:
     .venv/bin/python hent.py <id>
 """
 
+REGIONER = {
+    "oslo":       "Oslo og Østlandet",
+    "sorlandet":  "Sørlandet",
+    "vestlandet": "Bergen og Vestlandet",
+    "midt":       "Trondheim og Midt-Norge",
+    "nordland":   "Bodø og Nordland",
+    "troms":      "Tromsø og Troms",
+    "finnmark":   "Alta og Finnmark",
+}
+
 SAFARI = {"User-Agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 "
                          "(KHTML, like Gecko) Version/17.4 Safari/605.1.15")}
 
 KILDER: list[dict] = [
     # ───────────────────────── museer ─────────────────────────
     {
-        "id": "nasjonalmuseet", "navn": "Nasjonalmuseet", "kategori": "museum",
+        "id": "nasjonalmuseet", "region": "oslo", "navn": "Nasjonalmuseet", "kategori": "museum",
         "url": "https://www.nasjonalmuseet.no/", "bydel": "Vika",
         "type_adapter": "funk", "funksjon": "nasjonalmuseet",
         "detalj_dato": ".event-metadata__text-and-icon span.block|.event-metadata__text-and-icon",
@@ -29,7 +39,7 @@ KILDER: list[dict] = [
         "lat": 59.91163, "lon": 10.72842,
     },
     {
-        "id": "munch", "navn": "MUNCH", "kategori": "museum", "bydel": "Bjørvika",
+        "id": "munch", "region": "oslo", "navn": "MUNCH", "kategori": "museum", "bydel": "Bjørvika",
         "url": "https://www.munch.no/", "sider": ["https://www.munch.no/utstillinger"],
         "hoder": SAFARI,
         "element": ".ExhibitionCard",
@@ -42,7 +52,7 @@ KILDER: list[dict] = [
         "lat": 59.90562, "lon": 10.75516,
     },
     {
-        "id": "afmuseet", "navn": "Astrup Fearnley Museet", "kategori": "museum",
+        "id": "afmuseet", "region": "oslo", "navn": "Astrup Fearnley Museet", "kategori": "museum",
         "bydel": "Tjuvholmen", "url": "https://www.afmuseet.no/",
         "sider": ["https://www.afmuseet.no/utstillinger/", "https://www.afmuseet.no/arrangementer/"],
         "element": ".t2-featured-single-post",
@@ -54,7 +64,7 @@ KILDER: list[dict] = [
         "lat": 59.90693, "lon": 10.72194,
     },
     {
-        "id": "hok", "navn": "Henie Onstad Kunstsenter", "kategori": "museum",
+        "id": "hok", "region": "oslo", "navn": "Henie Onstad Kunstsenter", "kategori": "museum",
         "bydel": "Høvikodden", "url": "https://www.hok.no/",
         "sider": ["https://www.hok.no/utstillinger"],
         "element": "article.grid-item",
@@ -66,7 +76,7 @@ KILDER: list[dict] = [
         "lat": 59.88864, "lon": 10.55349,
     },
     {
-        "id": "vigeland", "navn": "Vigeland-museet", "kategori": "museum",
+        "id": "vigeland", "region": "oslo", "navn": "Vigeland-museet", "kategori": "museum",
         "bydel": "Frogner", "url": "https://vigeland.museum.no/",
         "element": "a[href*='/utstillinger/']", "lenke": "self",
         "tittel": "self",
@@ -79,7 +89,7 @@ KILDER: list[dict] = [
 
     # ─────────────────────── kunsthaller ───────────────────────
     {
-        "id": "kunstnerneshus", "navn": "Kunstnernes Hus", "kategori": "kunsthall",
+        "id": "kunstnerneshus", "region": "oslo", "navn": "Kunstnernes Hus", "kategori": "kunsthall",
         "bydel": "St. Hanshaugen", "url": "https://kunstnerneshus.no/",
         "sider": ["https://kunstnerneshus.no/program"],
         "element": "article.LinkItem",
@@ -91,7 +101,7 @@ KILDER: list[dict] = [
         "lat": 59.91954, "lon": 10.73079,
     },
     {
-        "id": "kunsthalloslo", "navn": "Kunsthall Oslo", "kategori": "kunsthall",
+        "id": "kunsthalloslo", "region": "oslo", "navn": "Kunsthall Oslo", "kategori": "kunsthall",
         "bydel": "Bjørvika", "url": "https://kunsthalloslo.no/",
         "sider": ["https://kunsthalloslo.no/?lang=nb"],
         "element": "li.wp-block-post",
@@ -102,7 +112,7 @@ KILDER: list[dict] = [
         "lat": 59.90796, "lon": 10.76152,
     },
     {
-        "id": "uks", "navn": "UKS – Unge Kunstneres Samfund", "kategori": "kunsthall",
+        "id": "uks", "region": "oslo", "navn": "UKS – Unge Kunstneres Samfund", "kategori": "kunsthall",
         "bydel": "Grønland", "url": "https://www.uks.no/",
         "element": "section.section__hero .row",
         "tittel": ".column__title",
@@ -112,7 +122,7 @@ KILDER: list[dict] = [
         "lat": 59.91705, "lon": 10.74385,
     },
     {
-        "id": "oslokunstforening", "navn": "Oslo Kunstforening", "kategori": "kunsthall",
+        "id": "oslokunstforening", "region": "oslo", "navn": "Oslo Kunstforening", "kategori": "kunsthall",
         "bydel": "Kvadraturen", "url": "https://www.oslokunstforening.no/",
         "element": "li.archive__item",
         "tittel": ".archive__item__title em|.archive__item__title",
@@ -125,7 +135,7 @@ KILDER: list[dict] = [
         "lat": 59.91014, "lon": 10.74033,
     },
     {
-        "id": "fotogalleriet", "navn": "Fotogalleriet", "kategori": "kunsthall",
+        "id": "fotogalleriet", "region": "oslo", "navn": "Fotogalleriet", "kategori": "kunsthall",
         "bydel": "Sentrum", "url": "https://fotogalleriet.no/",
         "element": "li.grid-item.exhibition, li.grid-item.event",
         "tittel": ".content-title",
@@ -136,7 +146,7 @@ KILDER: list[dict] = [
         "lat": 59.91746, "lon": 10.75026,
     },
     {
-        "id": "kunstnerforbundet", "navn": "Kunstnerforbundet", "kategori": "kunsthall",
+        "id": "kunstnerforbundet", "region": "oslo", "navn": "Kunstnerforbundet", "kategori": "kunsthall",
         "bydel": "Kvadraturen", "url": "https://kunstnerforbundet.no/",
         "sider": ["https://kunstnerforbundet.no/utstillinger"],
         "element": ".periods article",
@@ -151,7 +161,7 @@ KILDER: list[dict] = [
 
     # ──────────────── kommersielle gallerier ────────────────
     {
-        "id": "standardoslo", "navn": "STANDARD (OSLO)", "kategori": "galleri",
+        "id": "standardoslo", "region": "oslo", "navn": "STANDARD (OSLO)", "kategori": "galleri",
         "bydel": "Bislett", "url": "https://www.standardoslo.no/",
         "sider": ["https://www.standardoslo.no/exhibitions"],
         "element": "ul.clearwithin > li",
@@ -163,7 +173,7 @@ KILDER: list[dict] = [
         "lat": 59.92328, "lon": 10.72051,
     },
     {
-        "id": "oslcontemporary", "navn": "OSL contemporary", "kategori": "galleri",
+        "id": "oslcontemporary", "region": "oslo", "navn": "OSL contemporary", "kategori": "galleri",
         "bydel": "Skøyen", "url": "https://oslcontemporary.com/",
         "sider": ["https://oslcontemporary.com/exhibitions"],
         "element": ".opener-preview",
@@ -177,7 +187,7 @@ KILDER: list[dict] = [
         "lat": 59.91725, "lon": 10.714,
     },
     {
-        "id": "galleririis", "navn": "Galleri Riis", "kategori": "galleri",
+        "id": "galleririis", "region": "oslo", "navn": "Galleri Riis", "kategori": "galleri",
         "bydel": "Frogner", "url": "https://galleririis.com/",
         "sider": ["https://galleririis.com/exhibitions"],
         "element": "a.exhibition", "lenke": "self",
@@ -189,7 +199,7 @@ KILDER: list[dict] = [
         "lat": 59.91454, "lon": 10.72648,
     },
     {
-        "id": "semmingsen", "navn": "Galleri Semmingsen", "kategori": "galleri",
+        "id": "semmingsen", "region": "oslo", "navn": "Galleri Semmingsen", "kategori": "galleri",
         "bydel": "Frogner", "url": "https://semmingsen.no/",
         "element": ".ue-grid-item",
         "tittel": ".ue-grid-item-title",
@@ -199,7 +209,7 @@ KILDER: list[dict] = [
         "lat": 59.91754, "lon": 10.71517,
     },
     {
-        "id": "format", "navn": "Galleri Format", "kategori": "galleri",
+        "id": "format", "region": "oslo", "navn": "Galleri Format", "kategori": "galleri",
         "bydel": "Sentrum", "url": "https://www.format.no/",
         "sider": ["https://www.format.no/exhibitions-1", "https://www.format.no/upcoming"],
         "element": ".sqs-block.image-block",
@@ -212,7 +222,7 @@ KILDER: list[dict] = [
 
     # ──────────────── kunstnerdrevne og andre ────────────────
     {
-        "id": "femtensesse", "navn": "FEMTENSESSE", "kategori": "kunstnerdrevet",
+        "id": "femtensesse", "region": "oslo", "navn": "FEMTENSESSE", "kategori": "kunstnerdrevet",
         "bydel": "Ryen", "url": "https://femtensesse.no/",
         "element": "article.query-item.item-s-12",
         "tittel": "h2|h3|.query-item-title",
@@ -224,7 +234,7 @@ KILDER: list[dict] = [
         "lat": 59.93278, "lon": 10.78126,
     },
     {
-        "id": "ateliernord", "navn": "Atelier Nord", "kategori": "kunstnerdrevet",
+        "id": "ateliernord", "region": "oslo", "navn": "Atelier Nord", "kategori": "kunstnerdrevet",
         "bydel": "Grünerløkka", "url": "https://ateliernord.no/",
         "element": "article, .main-project-title-container",
         "tittel": "h2.entry-title|h2|h3",
@@ -235,7 +245,7 @@ KILDER: list[dict] = [
         "lat": 59.92227, "lon": 10.75819,
     },
     {
-        "id": "norskegrafikere", "navn": "Norske Grafikere", "kategori": "galleri",
+        "id": "norskegrafikere", "region": "oslo", "navn": "Norske Grafikere", "kategori": "galleri",
         "bydel": "Sentrum", "url": "https://norske-grafikere.no/",
         "sider": ["https://norske-grafikere.no/utstillinger/",
                   "https://norske-grafikere.no/tidligere-utstillinger/"],
@@ -248,7 +258,7 @@ KILDER: list[dict] = [
         "lat": 59.91091, "lon": 10.74174,
     },
     {
-        "id": "lnm", "navn": "Galleri LNM", "kategori": "galleri",
+        "id": "lnm", "region": "oslo", "navn": "Galleri LNM", "kategori": "galleri",
         "bydel": "Sentrum", "url": "https://lnm.no/",
         "sider": ["https://lnm.no/utstillinger"],
         "element": "div.col.three",

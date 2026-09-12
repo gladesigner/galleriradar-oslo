@@ -448,6 +448,7 @@ def _rydd(t: dict, kilde: dict) -> dict | None:
         "kilde_id": kilde["id"],
         "galleri": kilde["navn"],
         "kategori": kilde.get("kategori", "galleri"),
+        "region": kilde.get("region", "oslo"),
         "bydel": kilde.get("bydel", ""),
         "tittel": tittel[:300],
         "kunstnere": kunstnere[:400],

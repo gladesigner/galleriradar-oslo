@@ -81,6 +81,7 @@ def hent_alt(parallelle: int = 6) -> tuple[list[dict], list[dict]]:
             status.append({
                 "id": kilde["id"], "navn": kilde["navn"], "url": kilde["url"],
                 "kategori": kilde.get("kategori", "galleri"),
+                "region": kilde.get("region", "oslo"),
                 "bydel": kilde.get("bydel", ""),
                 "adresse": kilde.get("adresse", ""),
                 "lat": kilde.get("lat"), "lon": kilde.get("lon"),
@@ -214,8 +215,10 @@ def bygg(utmappe: str, forrige_peker: str | None, side_url: str, emne: str | Non
         r["periode"] = periodetekst(r.get("start_dato"), r.get("slutt_dato"),
                                     r.get("dato_tekst") or "")
 
+    from kilder import REGIONER
     data = {
         "bygget": _na(),
+        "regioner": REGIONER,
         "i_dag": date.today().isoformat(),
         "antall": len(rader),
         "nye": [n["nokkel"] for n in nye],
