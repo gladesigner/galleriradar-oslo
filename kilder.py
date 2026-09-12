@@ -213,6 +213,7 @@ KILDER: list[dict] = [
         "krev_dato": True, "maks": 20,
         "adresse": "Niels Juels gate 50, 0257 Oslo",
         "lat": 59.91754, "lon": 10.71517,
+        "reserve": True,      # svarer tomt til datasentre
     },
     {
         "id": "format", "region": "oslo", "navn": "Galleri Format", "kategori": "galleri",
@@ -251,6 +252,7 @@ KILDER: list[dict] = [
         "detalj": True, "krev_dato": True, "maks": 20,
         "adresse": "Olaf Ryes plass 2, 0552 Oslo",
         "lat": 59.92227, "lon": 10.75819,
+        "reserve": True,      # svarer tomt til datasentre
     },
     {
         "id": "norskegrafikere", "region": "oslo", "navn": "Norske Grafikere", "kategori": "galleri",

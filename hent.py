@@ -71,7 +71,9 @@ def _reservehent(url: str) -> requests.Response:
 
 
 def hent_side(url: str, forsok: int = 3, hoder: dict | None = None,
-              reserve: bool = False) -> requests.Response:
+              reserve: bool = False, bare_reserve: bool = False) -> requests.Response:
+    if bare_reserve:
+        return _reservehent(url)
     siste = None
     for n in range(forsok):
         try:
@@ -242,7 +244,8 @@ def _fra_css(kilde: dict) -> list[dict]:
     treff: list[dict] = []
     monster = re.compile(kilde["url_monster"]) if kilde.get("url_monster") else None
     for url in kilde.get("sider") or [kilde["url"]]:
-        r = hent_side(url, hoder=kilde.get("hoder"), reserve=kilde.get("reserve", False))
+        r = hent_side(url, hoder=kilde.get("hoder"), reserve=kilde.get("reserve", False),
+                      bare_reserve=kilde.get("_tving_reserve", False))
         s = _suppe(r)
         rammer = s.select(kilde["element"])
         if kilde.get("underelement"):
@@ -518,6 +521,11 @@ def hent_kilde(kilde: dict) -> tuple[list[dict], str | None]:
         return [], str(e)
     except Exception as e:                # noqa: BLE001 – én ødelagt kilde skal ikke velte resten
         return [], f"{type(e).__name__}: {e}"
+
+    # Enkelte nettsteder svarer 200 med en tom eller annerledes side til
+    # datasentre. Da er det verdt å prøve reserveveien før vi gir opp.
+    if not raa and kilde.get("reserve") and not kilde.get("_tving_reserve"):
+        return hent_kilde({**kilde, "_tving_reserve": True})
 
     ut, sett = [], set()
     for t in raa[: kilde.get("maks", 200)]:

@@ -305,33 +305,97 @@ private struct Knappetekst: View {
 
 // MARK: - kart
 
+/// Flere visningssteder som ligger for tett til å vises hver for seg ved
+/// gjeldende zoom. Klyngen viser samlet antall, og åpner seg når man trykker.
+private struct Klynge: Identifiable {
+    let id: String
+    let posisjon: CLLocationCoordinate2D
+    let steder: [(sted: Sted, utstillinger: [Utstilling])]
+
+    var antall: Int { steder.reduce(0) { $0 + $1.utstillinger.count } }
+    var eneste: Sted? { steder.count == 1 ? steder[0].sted : nil }
+    var navn: String { eneste?.navn ?? "\(steder.count) steder" }
+
+    /// Utsnittet som rommer alle stedene i klyngen, med litt luft rundt.
+    var omraade: MKCoordinateRegion {
+        let punkter = steder.compactMap { s -> CLLocationCoordinate2D? in
+            guard let lat = s.sted.lat, let lon = s.sted.lon else { return nil }
+            return CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        }
+        let breddegrader = punkter.map(\.latitude)
+        let lengdegrader = punkter.map(\.longitude)
+        let minB = breddegrader.min() ?? posisjon.latitude
+        let maksB = breddegrader.max() ?? posisjon.latitude
+        let minL = lengdegrader.min() ?? posisjon.longitude
+        let maksL = lengdegrader.max() ?? posisjon.longitude
+        return MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: (minB + maksB) / 2,
+                                           longitude: (minL + maksL) / 2),
+            span: MKCoordinateSpan(latitudeDelta: max((maksB - minB) * 2.2, 0.006),
+                                   longitudeDelta: max((maksL - minL) * 2.2, 0.006)))
+    }
+}
+
 struct KartVisning: View {
     @EnvironmentObject private var lager: Lager
     @State private var utsnitt = MapCameraPosition.region(
         MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 59.9139, longitude: 10.7400),
                            span: MKCoordinateSpan(latitudeDelta: 0.042, longitudeDelta: 0.042)))
+    @State private var span = MKCoordinateSpan(latitudeDelta: 0.042, longitudeDelta: 0.042)
     @State private var valgt: Sted?
+
+    /// Deler kartet i ruter som følger zoomnivået, og slår sammen stedene som
+    /// havner i samme rute. Zoomer man inn, deler klyngene seg av seg selv.
+    private var klynger: [Klynge] {
+        let celle = max(span.latitudeDelta / 7, 0.0004)
+        // Lengdegrader ligger tettere jo lenger nord man er – på Oslos
+        // breddegrad er én grad øst-vest omtrent halvparten så lang.
+        let celleLengde = celle * 2
+
+        var bøtter: [String: [(sted: Sted, utstillinger: [Utstilling])]] = [:]
+        for par in lager.stederMedProgram() {
+            guard let lat = par.sted.lat, let lon = par.sted.lon else { continue }
+            let nøkkel = "\(Int((lat / celle).rounded(.down)))_\(Int((lon / celleLengde).rounded(.down)))"
+            bøtter[nøkkel, default: []].append(par)
+        }
+
+        return bøtter.map { nøkkel, gruppe in
+            let lat = gruppe.compactMap { $0.sted.lat }.reduce(0, +) / Double(gruppe.count)
+            let lon = gruppe.compactMap { $0.sted.lon }.reduce(0, +) / Double(gruppe.count)
+            return Klynge(id: nøkkel,
+                          posisjon: CLLocationCoordinate2D(latitude: lat, longitude: lon),
+                          steder: gruppe)
+        }
+        .sorted { $0.id < $1.id }
+    }
 
     var body: some View {
         NavigationStack {
             Map(position: $utsnitt) {
-                ForEach(lager.stederMedProgram(), id: \.sted.id) { par in
-                    if let lat = par.sted.lat, let lon = par.sted.lon {
-                        Annotation(par.sted.navn,
-                                   coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon)) {
-                            Button { valgt = par.sted } label: {
-                                Text("\(par.utstillinger.count)")
-                                    .font(.system(size: 11, weight: .bold))
-                                    .frame(width: 22, height: 22)
-                                    .background(Color.aksent, in: Circle())
-                                    .overlay(Circle().stroke(.white, lineWidth: 1.5))
-                                    .foregroundStyle(.white)
-                                    .shadow(radius: 1.5, y: 1)
+                ForEach(klynger) { klynge in
+                    Annotation(klynge.navn, coordinate: klynge.posisjon) {
+                        Button {
+                            if let sted = klynge.eneste {
+                                valgt = sted
+                            } else {
+                                withAnimation { utsnitt = .region(klynge.omraade) }
                             }
+                        } label: {
+                            Text("\(klynge.antall)")
+                                .font(.system(size: klynge.steder.count > 1 ? 13 : 11,
+                                              weight: .bold))
+                                .frame(width: klynge.steder.count > 1 ? 30 : 22,
+                                       height: klynge.steder.count > 1 ? 30 : 22)
+                                .background(Color.aksent, in: Circle())
+                                .overlay(Circle().stroke(.white, lineWidth: 1.5))
+                                .foregroundStyle(.white)
+                                .shadow(radius: 1.5, y: 1)
                         }
-                        .annotationTitles(.automatic)
                     }
                 }
+            }
+            .onMapCameraChange(frequency: .onEnd) { ramme in
+                span = ramme.region.span
             }
             .navigationTitle("Kart")
             .navigationBarTitleDisplayMode(.inline)
