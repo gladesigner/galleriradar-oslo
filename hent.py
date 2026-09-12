@@ -456,8 +456,20 @@ def hent_detalj(url: str, kilde: dict) -> dict:
                     break
         bilde = ""
         og = sup.find("meta", property="og:image")
-        if og and og.get("content"):
-            bilde = urljoin(r.url, og["content"])
+        if og and og.get("content", "").strip():
+            bilde = urljoin(r.url, og["content"].strip())
+        if not bilde:
+            # Ikke alle setter og:image. Da tas det første bildet i brødteksten,
+            # så lenge det ikke er en logo eller et ikon.
+            for rotvelger in ("main", "article", "[role='main']", "body"):
+                rot = sup.select_one(rotvelger)
+                if rot is None:
+                    continue
+                kandidat = _bilde(rot, None, r.url)
+                if kandidat and not re.search(r"logo|icon|sprite|avatar|placeholder|favicon",
+                                              kandidat, re.IGNORECASE):
+                    bilde = kandidat
+                    break
         beskr = sup.find("meta", property="og:description") or sup.find("meta", attrs={"name": "description"})
         sammendrag = _rens(beskr.get("content", "")) if beskr else ""
         ot = sup.find("meta", property="og:title")

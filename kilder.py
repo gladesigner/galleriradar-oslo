@@ -374,6 +374,7 @@ KILDER: list[dict] = [
         "tittel": ".Calendar-programTitle",
         "dato": ".Calendar-programMeta",
         "merkelapp": ".Calendar-programType",
+        "detalj": True,          # oversikten har ingen bilder
         "maks": 30,
     },
 
@@ -390,6 +391,7 @@ KILDER: list[dict] = [
         "kunstnere": "[class*='pull-4'] span span:nth-of-type(1)",
         "dato": ".datetime-block|time",
         "merkelapp": "[class*='section-subti'] span:nth-of-type(1)",
+        "detalj": True,          # oversikten har ingen bilder
         "maks": 25,
     },
     {
@@ -430,6 +432,7 @@ KILDER: list[dict] = [
         "kunstnere": "[class*='w-1/4']",
         "dato": "[class*='w-3/4']",
         "krev_dato": True, "maks": 40,
+        "detalj": True,          # oversikten har ingen bilder
     },
     {
         "id": "tromsokunstforening", "region": "troms", "navn": "Tromsø Kunstforening",
@@ -457,6 +460,75 @@ KILDER: list[dict] = [
         "tittel": "h2|h3|.eg-post-title",
         "dato": "time|.date|p",
         "detalj": True, "krev_dato": True, "maks": 20,
+    },
+    # ──────────────── Østlandet utenfor Oslo ────────────────
+    {
+        "id": "gallerif15", "region": "oslo", "navn": "Galleri F 15", "kategori": "kunsthall",
+        "bydel": "Moss", "url": "https://gallerif15.no/",
+        "adresse": "Albyalleen 60, 1519 Moss",
+        "sider": ["https://gallerif15.no/exhibitions_f15/",
+                  "https://gallerif15.no/exhibitions_momentum/"],
+        "element": "a[href*='/exhibitions_']", "lenke": "self",
+        "tittel": "h2|h3|self",
+        "dato": "self",
+        "url_monster": r"/exhibitions_[a-z0-9]+/[a-z0-9][a-z0-9-]{3,}/?$",
+        "detalj": True, "detalj_dato": ".is-date|time", "krev_dato": True, "maks": 25,
+    },
+    {
+        "id": "kunsthallgrenland", "region": "oslo", "navn": "Kunsthall Grenland",
+        "kategori": "kunsthall", "bydel": "Porsgrunn",
+        "url": "https://kunsthallgrenland.no/",
+        "adresse": "Ælvespeilet, Kverndalsgata 8, 3717 Skien",
+        "element": ".wp-block-column",
+        "tittel": "h2|h3|.wp-block-heading",
+        "dato": "time|p|self",
+        "url_monster": r"kunsthallgrenland\.no/[a-z0-9-]{5,}",
+        "krev_dato": True, "maks": 20,
+    },
+    {
+        "id": "kistefos", "region": "oslo", "navn": "Kistefos", "kategori": "museum",
+        "bydel": "Jevnaker", "url": "https://www.kistefosmuseum.com/",
+        "adresse": "Samsmoveien 41, 3520 Jevnaker",
+        "element": "article, .card, li",
+        "tittel": "h2|h3|.title",
+        "dato": "time|.date|p",
+        "url_monster": r"kistefosmuseum\.com/[a-z0-9-]{5,}",
+        "detalj": True, "krev_dato": True, "maks": 20,
+    },
+    {
+        "id": "ostfoldkunstsenter", "region": "oslo", "navn": "Østfold kunstsenter",
+        "kategori": "kunsthall", "bydel": "Fredrikstad",
+        "url": "https://www.ostfold-kunstsenter.no/",
+        "adresse": "Tollbodgaten 105, 1632 Gamle Fredrikstad",
+        "element": "article, .card, li",
+        "tittel": "h2|h3|.entry-title",
+        "dato": "time|.date|p",
+        "detalj": True, "krev_dato": True, "maks": 20,
+    },
+    {
+        "id": "detgulehuset", "region": "oslo", "navn": "Det Gule Huset", "kategori": "galleri",
+        "bydel": "Fredrikstad", "url": "https://www.detgulehuset.no/",
+        "sider": ["https://www.detgulehuset.no/utstillinger-1"],
+        "element": "a[href], article", "lenke": "self",
+        "tittel": "h2|h3|self",
+        "dato": "time|.date|self",
+        "url_monster": r"detgulehuset\.no/[a-z0-9-]{5,}",
+        "detalj": True, "krev_dato": True, "maks": 20,
+    },
+
+    # ──────────────── Midt-Norge, ny kilde ────────────────
+    {
+        "id": "kuk", "region": "midt", "navn": "K.U.K – Kjøpmannsgata Ung Kunst",
+        "kategori": "kunsthall", "bydel": "Trondheim",
+        "url": "https://www.k-u-k.no/",
+        "adresse": "Kjøpmannsgata 46, 7010 Trondheim",
+        "sider": ["https://www.k-u-k.no/utstillinger/"],
+        "element": ".et_pb_blurb, .et_pb_text, article",
+        "tittel": "h2.et_pb_module_header|h2|h3|h4",
+        "dato": "self|p",
+        "url_monster": r"k-u-k\.no/project/",
+        "detalj": True,
+        "maks": 20,
     },
 ]
 

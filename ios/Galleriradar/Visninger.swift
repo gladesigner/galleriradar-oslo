@@ -5,11 +5,17 @@ import SwiftUI
 
 // MARK: - farger
 
+// Fargene er de samme som i appikonet: kobolt for det man kan trykke på,
+// magenta for det som er nytt, oransje for det som snart er over.
 extension Color {
-    static let papir = Color(light: #colorLiteral(red: 0.965, green: 0.957, blue: 0.941, alpha: 1),
+    static let papir = Color(light: #colorLiteral(red: 0.969, green: 0.941, blue: 0.898, alpha: 1),
                              dark: #colorLiteral(red: 0.075, green: 0.071, blue: 0.063, alpha: 1))
-    static let aksent = Color(light: #colorLiteral(red: 0.604, green: 0.231, blue: 0.133, alpha: 1),
-                              dark: #colorLiteral(red: 0.878, green: 0.541, blue: 0.416, alpha: 1))
+    static let aksent = Color(light: #colorLiteral(red: 0.306, green: 0.439, blue: 0.965, alpha: 1),
+                              dark: #colorLiteral(red: 0.492, green: 0.608, blue: 1.000, alpha: 1))
+    static let merke = Color(light: #colorLiteral(red: 0.765, green: 0.247, blue: 0.847, alpha: 1),
+                             dark: #colorLiteral(red: 0.898, green: 0.545, blue: 0.961, alpha: 1))
+    static let haster = Color(light: #colorLiteral(red: 0.820, green: 0.463, blue: 0.118, alpha: 1),
+                              dark: #colorLiteral(red: 0.941, green: 0.643, blue: 0.361, alpha: 1))
 }
 
 extension Color {
@@ -167,13 +173,13 @@ struct Utstillingsrad: View {
                     Text(utstilling.periode ?? "").font(.caption).foregroundStyle(.secondary)
                     if !utstilling.erArrangement, let d = utstilling.dagerIgjen(), d <= 7 {
                         Text(d == 0 ? "Siste dag" : d == 1 ? "Siste dag i morgen" : "\(d) dager igjen")
-                            .font(.caption.weight(.semibold)).foregroundStyle(Color.aksent)
+                            .font(.caption.weight(.semibold)).foregroundStyle(Color.haster)
                     }
                 }
             }
             Spacer(minLength: 0)
             if lager.erMerket(utstilling) {
-                Image(systemName: "star.fill").font(.caption).foregroundStyle(Color.aksent)
+                Image(systemName: "star.fill").font(.caption).foregroundStyle(Color.merke)
             }
         }
         .padding(.vertical, 4)
@@ -186,7 +192,7 @@ struct Merkelapp: View {
         Text(tekst)
             .font(.caption2.weight(.bold))
             .padding(.horizontal, 6).padding(.vertical, 2)
-            .background(Color.aksent, in: Capsule())
+            .background(Color.merke, in: Capsule())
             .foregroundStyle(.white)
     }
 }
@@ -240,7 +246,8 @@ struct DetaljVisning: View {
                              ? (d == 0 ? "I dag" : d == 1 ? "I morgen" : "Om \(d) dager")
                              : (d == 0 ? "Siste dag i dag" : d == 1 ? "Siste dag i morgen"
                                 : "\(d) dager igjen"))
-                            .font(.subheadline.weight(.semibold)).foregroundStyle(Color.aksent)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(utstilling.erArrangement ? Color.aksent : Color.haster)
                     }
                 }
 
