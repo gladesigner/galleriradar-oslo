@@ -1,7 +1,8 @@
 """Tegner appikonet i alle størrelsene som trengs.
 
 Motivet: en ramme med to lerret inni, der det ene bryter ut av rammen, og en
-liten prikk som gir en tredje størrelse. Kjøres når ikonet skal endres:
+liten prikk som gir en tredje størrelse. Fargene er hentet fra et maleri –
+kobolt, oransje sol, magenta og grønt. Kjøres når ikonet skal endres:
 
     .venv/bin/python lag_ikon.py
 """
@@ -10,10 +11,10 @@ from PIL import Image, ImageDraw
 OPPTEGNING = 4          # tegnes opp og skaleres ned, for myke kanter
 
 PAPIR    = (247, 240, 229)
-RAMME    = (204, 74, 38)
-LERRET_1 = (233, 94, 74)
-LERRET_2 = (72, 128, 104)
-PRIKK    = (240, 170, 35)
+RAMME    = (78, 112, 246)
+LERRET_1 = (232, 136, 52)
+LERRET_2 = (214, 96, 232)
+PRIKK    = (96, 196, 130)
 
 
 def tegn(storrelse: int) -> Image.Image:
