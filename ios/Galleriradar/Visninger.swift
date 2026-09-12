@@ -51,7 +51,7 @@ struct Hovedvisning: View {
 
             ListeVisning(fast: .merket)
                 .tag(3)
-                .tabItem { Label("Vil se", systemImage: "star") }
+                .tabItem { Label("Min liste", systemImage: "star") }
 
             OmVisning()
                 .tag(4)
@@ -129,7 +129,8 @@ private struct Tomtrom: View {
         } else {
             ContentUnavailableView(
                 visning == .nytt ? "Ingenting nytt"
-                    : visning == .arrangement ? "Ingen arrangementer" : "Ingen utstillinger",
+                    : visning == .arrangement ? "Ingen arrangementer"
+                    : visning == .merket ? "Min liste er tom" : "Ingen utstillinger",
                 systemImage: visning == .merket ? "star"
                     : visning == .arrangement ? "calendar" : "paintpalette",
                 description: Text(visning == .nytt
@@ -137,7 +138,7 @@ private struct Tomtrom: View {
                     : visning == .arrangement
                         ? "Ingenting står på programmet den kommende måneden."
                         : visning == .merket
-                            ? "Trykk stjerna på en utstilling for å samle den her."
+                            ? "Trykk «Legg i min liste» på en utstilling for å samle den her."
                             : "Dra ned for å hente på nytt."))
         }
     }
@@ -245,6 +246,14 @@ struct DetaljVisning: View {
                 }
 
                 VStack(spacing: 10) {
+                    // Den viktigste knappen først, og den sier hva den gjør.
+                    Button { lager.veksleMerke(utstilling) } label: {
+                        Knappetekst(
+                            tekst: lager.erMerket(utstilling) ? "Fjern fra min liste" : "Legg i min liste",
+                            ikon: lager.erMerket(utstilling) ? "star.fill" : "star",
+                            fylt: lager.erMerket(utstilling))
+                    }
+
                     if let lenke = utstilling.lenke {
                         Link(destination: lenke) {
                             Knappetekst(tekst: "Åpne hos \(utstilling.galleri)", ikon: "safari")
@@ -324,16 +333,21 @@ struct DetaljVisning: View {
 private struct Knappetekst: View {
     let tekst: String
     let ikon: String
+    var fylt = false
+
     var body: some View {
         HStack {
             Image(systemName: ikon)
-            Text(tekst)
+            Text(tekst).fontWeight(fylt ? .semibold : .regular)
             Spacer()
-            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
+            if !fylt {
+                Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
+            }
         }
         .padding(.vertical, 12).padding(.horizontal, 14)
-        .background(Color.aksent.opacity(0.10), in: RoundedRectangle(cornerRadius: 10))
-        .foregroundStyle(Color.aksent)
+        .background(fylt ? Color.aksent : Color.aksent.opacity(0.10),
+                    in: RoundedRectangle(cornerRadius: 10))
+        .foregroundStyle(fylt ? .white : Color.aksent)
     }
 }
 

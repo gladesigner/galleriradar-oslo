@@ -144,7 +144,7 @@
       <article class="kort">
         <a href="${trygg(u.url)}" target="_blank" rel="noopener">${bilde}</a>
         <button class="stjerne" aria-pressed="${merket}" data-nokkel="${trygg(u.nokkel)}"
-                title="Vil se">${merket ? '★' : '☆'}</button>
+                title="Legg i min liste">${merket ? '★' : '☆'}</button>
         <div class="kort__tekst">
           <p class="kort__sted">
             <span>${trygg(u.galleri)}</span>
@@ -171,7 +171,9 @@
         ? '<p class="tomt">Ingen utstillinger har åpnet de siste sju dagene.</p>'
         : visning === 'arrangement'
           ? '<p class="tomt">Ingenting står på programmet den kommende måneden.</p>'
-          : '<p class="tomt">Ingenting her akkurat nå.</p>';
+          : (visning === 'merket'
+          ? '<p class="tomt">Min liste er tom. Trykk stjerna på en utstilling for å samle den her.</p>'
+          : '<p class="tomt">Ingenting her akkurat nå.</p>');
       return;
     }
     const banner = visning === 'nytt'

@@ -106,7 +106,7 @@ final class Lager: ObservableObject {
 
     enum Visning: String, CaseIterable, Identifiable {
         case naa = "Nå", nytt = "Nytt", kommer = "Kommer", fast = "Permanent"
-        case arrangement = "Arrangementer", merket = "Vil se"
+        case arrangement = "Arrangementer", merket = "Min liste"
         var id: String { rawValue }
     }
 
