@@ -192,6 +192,7 @@ KILDER: list[dict] = [
         "krev_dato": True,
         "adresse": "Eilert Sundts gate 40, 0355 Oslo",
         "lat": 59.92328, "lon": 10.72051,
+        "reserve": True,      # svarer ikke alltid til datasentre
     },
     {
         "id": "oslcontemporary", "region": "oslo", "navn": "OSL contemporary", "kategori": "galleri",
@@ -351,6 +352,7 @@ KILDER: list[dict] = [
         "dato": ".khb-card-text|.uk-card-body",
         "merkelapp": ".uk-label|.khb-card-label",
         "maks": 40,
+        "reserve": True,      # svarer ikke alltid til datasentre
     },
     {
         "id": "kode", "region": "vestlandet", "navn": "KODE", "kategori": "museum",
