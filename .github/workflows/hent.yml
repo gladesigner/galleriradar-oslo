@@ -1,0 +1,72 @@
+# Henter utstillingene og publiserer siden på nytt. Kjører hver fjerde time,
+# og manuelt fra Actions-fanen når du vil ha ferske tall med én gang.
+name: Hent utstillinger
+
+on:
+  schedule:
+    - cron: "5 */4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  bygg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r krav.txt
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      # Bildene lastes ned én gang og gjenbrukes, så galleriene slipper
+      # å levere de samme filene seks ganger i døgnet.
+      - name: Hent bildebufferen
+        uses: actions/cache/restore@v4
+        with:
+          path: data/bilder
+          key: bilder-${{ github.run_id }}
+          restore-keys: bilder-
+
+      - name: Bygg siden
+        env:
+          NTFY_EMNE: ${{ secrets.NTFY_EMNE }}
+        run: |
+          python bygg.py --ut _side \
+            --forrige "${{ steps.pages.outputs.base_url }}/data.json" \
+            --url "${{ steps.pages.outputs.base_url }}/" \
+            --ntfy "$NTFY_EMNE"
+
+      - name: Lagre bildebufferen
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: data/bilder
+          key: bilder-${{ github.run_id }}
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _side
+
+  publiser:
+    needs: bygg
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.utrulling.outputs.page_url }}
+    steps:
+      - id: utrulling
+        uses: actions/deploy-pages@v4

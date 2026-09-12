@@ -1,65 +1,66 @@
 # Galleriradar Oslo
 
-Samler utstillinger og arrangementer fra gallerier, kunsthaller og museer i Oslo,
-holder seg selv oppdatert, og sier fra når noe nytt dukker opp.
-
-    ./start.sh                  # http://localhost:8140/
+Samler utstillinger og arrangementer fra gallerier, kunsthaller og museer i Oslo.
+Innhøstingen kjøres av GitHub Actions hver fjerde time, siden publiseres på GitHub
+Pages, og varsler går til telefonen via ntfy. Ingen tjener å passe på, og ingen
+maskin som må stå på hjemme.
 
 ## Slik henger det sammen
+
+    GitHub Actions (hver 4. time)
+        └── bygg.py ── kilder.py + hent.py ──> galleriens nettsider
+                    ├── data.json          (hele listen, med bilder)
+                    ├── ntfy.sh            (varsel til telefonene)
+                    └── GitHub Pages       (selve appen)
 
 | Fil | Rolle |
 | --- | --- |
 | `kilder.py` | Ett oppslag per visningssted – nettadresse og CSS-velgere |
 | `hent.py` | Innhøstingsmotoren. Fire adaptertyper: `css`, `jsonld`, `wp`, `funk` |
-| `egne.py` | Kilder som trenger egen kode (Nasjonalmuseet henter fra sitemap) |
+| `egne.py` | Kilder som trenger egen kode (Nasjonalmuseet hentes fra sitemap) |
 | `datotolk.py` | Tolker «13. aug – 19. sep», «August 13, 2026», «Vises til 11.10.2026» |
-| `db.py` | SQLite i `data/galleri.db` – én rad per utstilling, med historikk |
-| `innhost.py` | Kjører alle kilder, lagrer, varsler |
-| `varsel.py` | Systemvarsel på macOS |
-| `bilder.py` | Skalerer gallerienes bilder ned før de sendes til telefonen |
-| `app.py` | Flask-tjeneren og API-et |
+| `bilder.py` | Skalerer gallerienes bilder ned før de legges på siden |
+| `bygg.py` | Bygger hele siden: henter, fletter, skriver `data.json`, varsler |
+| `front/` | Selve appen – ren HTML, CSS og JavaScript, ingen rammeverk |
+| `.github/workflows/hent.yml` | Jobben som kjører det hele |
 
-## Oppdatering og varsling
+Det finnes ingen database. **Forrige publiserte `data.json` er hukommelsen**:
+hver kjøring leser den fra den publiserte siden, og beholder `forste_gang` for alt
+som allerede var kjent. Det som ikke fantes der fra før, er nytt.
 
-Appen henter alle kilder hver 4. time så lenge den kjører (`NB_GALLERI_INTERVALL`
-styrer intervallet), og med én gang du trykker på oppdater-knappen. Utstillinger
-som ikke er sett før, blir merket **NY** og utløser et systemvarsel på Mac-en.
+Avsluttede utstillinger blir liggende i to år, slik at «Tidligere» har innhold,
+med et tak på 1500 rader.
 
-Første kjøring varsler ikke – da ville hele basen ha lyst opp som ny.
+## Varsling
 
-Hver telefon husker selv når den sist så listen (`localStorage`), så «NY» blir
-riktig for begge to, uavhengig av hverandre.
+Jobben legger en melding på en ntfy-kanal når noe nytt dukker opp. Kanalnavnet
+ligger i repo-hemmeligheten `NTFY_EMNE` – aldri i koden, for hvem som helst kan
+lese en kanal de kjenner navnet på.
 
-### Alltid i gang
+På telefonen: installer **ntfy** fra App Store, trykk +, skriv inn samme
+kanalnavn. Ferdig – da kommer varslene som vanlige push-varsler.
 
-For at appen skal hente nytt også når du ikke har startet den manuelt:
-
-    cp no.trondm.galleriradar.plist ~/Library/LaunchAgents/
-    launchctl load ~/Library/LaunchAgents/no.trondm.galleriradar.plist
-
-Stopp igjen med `launchctl unload ~/Library/LaunchAgents/no.trondm.galleriradar.plist`.
+Første kjøring varsler ikke. Da ville hele listen ha lyst opp som ny.
 
 ## På iPhone
 
-Appen er en PWA og kan legges på hjem-skjermen:
+1. Åpne Pages-adressen i Safari
+2. Del-knappen → **Legg til på Hjem-skjerm**
 
-1. Mac-en og telefonen må være på samme wifi. Finn maskinens adresse med
-   `ipconfig getifaddr en0` – for eksempel `192.168.1.24`.
-2. Åpne `http://192.168.1.24:8140/` i Safari på telefonen.
-3. Del-knappen → **Legg til på Hjem-skjerm**. Da får den eget ikon, egen
-   oppstartsside og ingen adresselinje.
+Da får appen eget ikon, starter i fullskjerm, og husker listen slik at den virker
+også uten dekning. Hver telefon husker selv når den sist så listen, så «NY» blir
+riktig for begge to uavhengig av hverandre. Stjernemerkene ligger også lokalt på
+hver telefon.
 
-Over vanlig `http://` på lokalnettet lar ikke Safari appen mellomlagre sidene
-(servicearbeidere krever HTTPS eller localhost). Ikonet og fullskjermvisningen
-virker likevel – det er bare offline-visningen som uteblir.
+## Kjøre lokalt
 
-Utenfor hjemmenettet trengs en tunnel – Tailscale er det enkleste: installer det
-på Mac-en og på begge telefonene, så nås appen på maskinens Tailscale-adresse
-uansett hvor dere er.
+    .venv/bin/python -m pip install -r krav.txt
+    ./start.sh                  # bygger og serverer på http://localhost:8140/
+    ./start.sh --bare-server    # hopper over innhøstingen
 
 ## Legge til et galleri
 
-Skriv et nytt oppslag i `kilder.py` og prøv det:
+Skriv et nytt oppslag i `kilder.py` og prøv det alene:
 
     .venv/bin/python hent.py <id>
 
@@ -68,12 +69,12 @@ kaster alt som ikke har en dato – nyttig mot menylenker og annen støy.
 
 ## Når et galleri legger om nettsiden
 
-`/kilder` viser siste innhøsting per sted. Står det «ingen treff» over tid, er
-velgeren i `kilder.py` utdatert og må justeres.
+`kilder.html` på den publiserte siden viser siste innhøsting per sted. Står det
+«ingen treff» over tid, er velgeren i `kilder.py` utdatert og må justeres.
 
 ## Steder som ikke lar seg høste ennå
 
 Peder Lund, Mesén, Tenthaus, PRAKSIS, RAM galleri, Kunstverket, Buer Gallery,
-Destiny's Atelier og VI, VII bygger listene sine i nettleseren (JavaScript), og gir
-ingenting fra seg til en vanlig innhøster. De må enten hentes med en hodeløs
-nettleser eller vente på at nettsidene endrer seg.
+Destiny's Atelier og VI, VII bygger listene sine i nettleseren, og gir ingenting
+fra seg til en vanlig innhøster. De må enten hentes med en hodeløs nettleser eller
+vente på at nettsidene endrer seg.
