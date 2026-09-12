@@ -152,18 +152,58 @@ def _plukk_ikke_dato(rot, velger: str | None) -> str:
     return ""
 
 
+def _fra_srcset(srcset: str) -> list[tuple[int, str]]:
+    """«bilde.jpg 300w, bilde-stor.jpg 1024w» → [(300, ...), (1024, ...)]"""
+    ut = []
+    # Deles bare på komma etterfulgt av mellomrom: adressene selv kan ha
+    # komma i seg, slik MUNCH har det i «crop=151,0,2799,1765».
+    for bit in re.split(r",\s+", srcset.strip()):
+        deler = bit.strip().split()
+        if not deler:
+            continue
+        bredde = 0
+        if len(deler) > 1 and deler[1].endswith("w"):
+            try:
+                bredde = int(deler[1][:-1])
+            except ValueError:
+                bredde = 0
+        ut.append((bredde, deler[0]))
+    return ut
+
+
 def _bilde(rot, velger: str | None, basis: str) -> str:
-    el = rot.select_one(velger) if velger else rot.select_one("img")
+    """Finner det største fornuftige bildet i et element.
+
+    Mange nettsteder legger et bitte lite plassholderbilde i src og de ekte
+    bildene i srcset – Fotogalleriet bruker 16 piksler brede stubber. Derfor
+    leses srcset først, og bredeste variant under 2000 piksler vinner.
+    """
+    el = rot.select_one(velger) if velger else None
+    if el is None:
+        el = rot.select_one("img")
     if el is None:
         return ""
-    for attr in ("src", "data-src", "data-lazy-src", "content"):
+
+    kandidater: list[tuple[int, str]] = []
+    for kilde in [el] + rot.select("source"):
+        for attr in ("srcset", "data-srcset"):
+            if kilde.get(attr):
+                kandidater += _fra_srcset(kilde[attr])
+    for attr in ("data-src", "data-lazy-src", "data-original", "src", "content"):
         v = el.get(attr)
         if v and not v.startswith("data:"):
-            return urljoin(basis, v)
-    srcset = el.get("srcset") or el.get("data-srcset")
-    if srcset:
-        return urljoin(basis, srcset.split(",")[0].strip().split(" ")[0])
-    return ""
+            kandidater.append((0, v))
+
+    kandidater = [(b, u) for b, u in kandidater if u and not u.startswith("data:")]
+    if not kandidater:
+        return ""
+    med_bredde = [k for k in kandidater if k[0] > 0]
+    if med_bredde:
+        brukbare = [k for k in med_bredde if k[0] <= 2000] or med_bredde
+        valgt = max(brukbare, key=lambda k: k[0])[1]
+    else:
+        valgt = kandidater[0][1]
+    return urljoin(basis, valgt)
 
 
 def _rens(s: str) -> str:
@@ -227,7 +267,8 @@ def _fra_css(kilde: dict) -> list[dict]:
                 "dato_tekst": dato_tekst,
                 "url": fullurl,
                 "ar_hint": _ar_hint(ramme, kilde.get("ar_hint")),
-                "bilde": _bilde(el, kilde.get("bilde"), r.url),
+                "bilde": _bilde(el, kilde.get("bilde"), r.url)
+                         or _bilde(ramme, kilde.get("bilde"), r.url),
                 "sammendrag": _plukk(el, kilde.get("sammendrag")),
                 "merkelapp": _plukk(el, kilde.get("merkelapp")),
             })
@@ -425,8 +466,10 @@ def _rydd(t: dict, kilde: dict) -> dict | None:
     bilde = t.get("bilde", "")
     sammendrag = _rens(t.get("sammendrag", ""))
 
-    if (kilde.get("detalj") or kilde.get("tittel_fra_detalj")) and url.startswith("http") \
-            and not (start and slutt and not kilde.get("tittel_fra_detalj")):
+    # Detaljsiden hentes når listen mangler noe vi vil ha: datoer, bilde
+    # eller tittel. Svaret mellomlagres, så det koster lite.
+    mangler = (not (start or slutt)) or (not bilde) or kilde.get("tittel_fra_detalj")
+    if kilde.get("detalj") and url.startswith("http") and mangler:
         d = hent_detalj(url, kilde)
         if kilde.get("tittel_fra_detalj") and d.get("tittel"):
             tittel = d["tittel"].split(" | ")[0].split(" - ")[0].strip() or tittel

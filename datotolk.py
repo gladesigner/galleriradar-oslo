@@ -31,6 +31,11 @@ MANED_NAVN = ["januar", "februar", "mars", "april", "mai", "juni",
 _RE_DMY_TEKST = re.compile(
     r"(?<!\d)(\d{1,2})\.?\s*(" + "|".join(sorted(MANEDER, key=len, reverse=True)) + r")\.?"
     r"(?:\s*,?\s*(\d{4}))?", re.IGNORECASE)
+# «10.–20. september 2026» – to dager som deler månedsnavn
+_RE_DAG_DAG_MND = re.compile(
+    r"(?<!\d)(\d{1,2})\.?\s*[-–—]\s*(\d{1,2})\.?\s*("
+    + "|".join(sorted(MANEDER, key=len, reverse=True)) + r")\.?(?:\s*,?\s*(\d{4}))?",
+    re.IGNORECASE)
 # «August 13, 2026» – engelsk rekkefølge
 _RE_MDY_TEKST = re.compile(
     r"\b(" + "|".join(sorted(MANEDER, key=len, reverse=True)) + r")\.?\s+(\d{1,2})(?:st|nd|rd|th)?"
@@ -43,7 +48,11 @@ _RE_DMY_TALL = re.compile(r"(?<!\d)(\d{1,2})[./-](\d{1,2})(?:[./-](\d{2,4}))?(?!
 # ISO
 _RE_ISO = re.compile(r"(?<!\d)(\d{4})-(\d{2})-(\d{2})(?!\d)")
 
-SKILLETEGN = re.compile(r"\s*(?:–|—|−|-{1,2}|til og med|t\.?o\.?m\.?|til|through|until|to)\s*", re.IGNORECASE)
+# Ordene må ha ordgrenser. Uten dem deler «to» ordet «ok-to-ber» i to, og
+# hele datoen faller fra hverandre.
+SKILLETEGN = re.compile(
+    r"\s*(?:–|—|−|-{1,2}|\b(?:til og med|t\.?o\.?m\.?|til|through|until|to)\b)\s*",
+    re.IGNORECASE)
 _RE_APEN_START = re.compile(r"^\s*(?:fra og med|fra|f\.?o\.?m\.?|åpner|opens|from)\b", re.IGNORECASE)
 _RE_APEN_SLUTT = re.compile(
     r"^\s*(?:til og med|til|t\.?o\.?m\.?|fram til|frem til|until|through|ends)\b"
@@ -139,6 +148,17 @@ def tolk_periode(tekst: str | None, hint_ar: int | None = None) -> tuple[str | N
     # originalteksten – ellers er det bare en rest etter et fjernet klokkeslett.
     apen_hale = bool(re.search(r"[–—−-]\s*$", raa))
 
+    # «10.–20. september»: begge dagene hører til samme måned, og en vanlig
+    # deling på streken ville mistet den første.
+    m = _RE_DAG_DAG_MND.search(t)
+    if m:
+        mnd = MANEDER[m.group(3).lower().rstrip(".")]
+        ar = int(m.group(4)) if m.group(4) else None
+        a = _lag_dato(int(m.group(1)), mnd, ar, hint_ar)
+        b = _lag_dato(int(m.group(2)), mnd, ar, hint_ar)
+        if a and b and a <= b:
+            return a.isoformat(), b.isoformat()
+
     # Del på skilletegn, men bare når det faktisk skiller to datoer
     deler = SKILLETEGN.split(t)
     deler = [d for d in deler if d.strip()]
@@ -149,9 +169,17 @@ def tolk_periode(tekst: str | None, hint_ar: int | None = None) -> tuple[str | N
         hode = _finn_datoer(" ".join(deler[:-1]), hint_ar=hint)
         if hode and hale:
             start, slutt = hode[0], hale[-1]
-            if slutt < start:            # årsskifte: «13. nov – 28. feb»
+            if slutt < start:
+                # Årsskifte. Står årstallet bare bakerst – «25. november –
+                # 09. januar 2022» – hører starten til året før slutten.
+                # Ellers er det slutten som skal et år fram: «13. nov – 28. feb».
+                ar_bak = bool(re.search(r"\b(20\d{2})\b", deler[-1]))
+                ar_foran = bool(re.search(r"\b(20\d{2})\b", " ".join(deler[:-1])))
                 try:
-                    slutt = slutt.replace(year=slutt.year + 1)
+                    if ar_bak and not ar_foran:
+                        start = start.replace(year=start.year - 1)
+                    else:
+                        slutt = slutt.replace(year=slutt.year + 1)
                 except ValueError:
                     pass
             return start.isoformat(), slutt.isoformat()

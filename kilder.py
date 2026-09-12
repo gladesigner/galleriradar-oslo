@@ -125,6 +125,7 @@ KILDER: list[dict] = [
         "kunstnere": ".column__artists|.column__subtitle",
         "adresse": "Keysers gate 1, 0165 Oslo",
         "lat": 59.91705, "lon": 10.74385,
+        "detalj": True,           # oversikten har ingen bilder
     },
     {
         "id": "oslokunstforening", "region": "oslo", "navn": "Oslo Kunstforening", "kategori": "kunsthall",
@@ -245,6 +246,8 @@ KILDER: list[dict] = [
         "tittel": "h2.entry-title|h2|h3",
         "dato": "time|.date",
         "url_monster": r"ateliernord\.no/(?!$|\?|#)[a-z0-9-]{4,}",
+        # utlysninger er ikke utstillinger, og datoene i teksten er søknadsfrister
+        "hopp_over": [r"open call", r"utlysning", r"residency"],
         "detalj": True, "krev_dato": True, "maks": 20,
         "adresse": "Olaf Ryes plass 2, 0552 Oslo",
         "lat": 59.92227, "lon": 10.75819,

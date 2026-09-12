@@ -53,9 +53,9 @@ final class Lager: ObservableObject {
 
     // MARK: hva som regnes som nytt
 
-    /// «Nytt» er en fast luke: i dag og seks dager bakover. Da betyr fanen det
-    /// samme uansett hvilken telefon den åpnes på, og uansett hvor lenge det er
-    /// siden sist noen så på listen.
+    /// «Nytt» er utstillinger som nettopp har åpnet: i dag og seks dager
+    /// bakover. Det er åpningsdatoen som teller, ikke når innhøsteren først
+    /// fikk øye på dem – da betyr fanen det samme for alle som åpner appen.
     static let nyttVindu = 6
 
     var nyttGrense: String {
@@ -64,7 +64,9 @@ final class Lager: ObservableObject {
     }
 
     func erNy(_ u: Utstilling) -> Bool {
-        String(u.forsteGang.prefix(10)) >= nyttGrense
+        guard let start = u.startDato else { return false }
+        let iDag = data.iDag.isEmpty ? Dato.tekst(Date()) : data.iDag
+        return start >= nyttGrense && start <= iDag
     }
 
     // MARK: «vil se»
@@ -101,10 +103,9 @@ final class Lager: ObservableObject {
             liste = data.utstillinger.filter { ($0.startDato ?? "") > iDag }
             liste.sort { ($0.startDato ?? "") < ($1.startDato ?? "") }
         case .nytt:
-            // nyoppdagede som fortsatt henger – det som allerede er tatt ned
-            // hjelper ingen å vite om
+            // nettopp åpnet, og fortsatt oppe
             liste = data.utstillinger.filter { erNy($0) && ($0.sluttDato == nil || $0.sluttDato! >= iDag) }
-            liste.sort { $0.forsteGang > $1.forsteGang }
+            liste.sort { ($1.startDato ?? "") < ($0.startDato ?? "") }
         case .merket:
             liste = data.utstillinger.filter { merket.contains($0.nokkel) }
             liste.sort { ($0.sluttDato ?? "9999") < ($1.sluttDato ?? "9999") }

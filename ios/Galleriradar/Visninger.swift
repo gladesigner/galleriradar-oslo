@@ -60,7 +60,7 @@ struct ListeVisning: View {
                 } else {
                     List {
                         if valgt == .nytt {
-                            Text("Dukket opp de siste sju dagene")
+                            Text("Åpnet de siste sju dagene")
                                 .font(.footnote).foregroundStyle(.secondary)
                                 .listRowSeparator(.hidden)
                         }
@@ -101,7 +101,7 @@ private struct Tomtrom: View {
                 visning == .nytt ? "Ingenting nytt" : "Ingen utstillinger",
                 systemImage: visning == .merket ? "star" : "paintpalette",
                 description: Text(visning == .nytt
-                    ? "Ingenting nytt de siste sju dagene. Du får varsel når noe dukker opp."
+                    ? "Ingen utstillinger har åpnet de siste sju dagene."
                     : visning == .merket
                         ? "Trykk stjerna på en utstilling for å samle den her."
                         : "Dra ned for å hente på nytt."))
@@ -402,8 +402,12 @@ struct OmVisning: View {
                 }
 
                 Section {
-                    Text("Utstillingene hentes fra galleriene selv, fire ganger i døgnet.")
-                        .font(.footnote).foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Utstillingene hentes fra galleriene selv, fire ganger i døgnet.")
+                        Text("Appen er utviklet av Gladesigner. En bedrift opptatt av kunst og kultur siden 2007.")
+                    }
+                    .font(.footnote).foregroundStyle(.secondary)
+                    .padding(.vertical, 2)
                 }
             }
             .navigationTitle("Om")

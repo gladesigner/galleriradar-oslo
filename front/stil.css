@@ -134,6 +134,7 @@ main { flex: 1 0 auto; padding: 1rem; max-width: 1180px; width: 100%; margin: 0 
 }
 .bunn a { color: var(--dempet); }
 .bunn__hoyre { display: flex; gap: 1rem; align-items: center; }
+.bunn__kreditt { flex: 1 1 18rem; min-width: 0; }
 .bryter { display: flex; gap: .35rem; align-items: center; cursor: pointer; }
 
 /* ── kildesiden ── */

@@ -12,8 +12,8 @@
   let visning = 'aktuelt';
   let tidsavbrudd = null;
 
-  // «Nytt» er en fast luke: i dag og seks dager bakover. Da betyr fanen det
-  // samme uansett hvilken telefon den åpnes på.
+  // «Nytt» er utstillinger som nettopp har åpnet: i dag og seks dager bakover.
+  // Det er åpningsdatoen som teller, ikke når innhøsteren fikk øye på dem.
   const NYTT_VINDU = 6;
   const nyttGrense = () => {
     const d = new Date();
@@ -35,7 +35,7 @@
   const trygg = (s) => (s == null ? '' : String(s)).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  const erNy = (u) => (u.forste_gang || '').slice(0, 10) >= nyttGrense();
+  const erNy = (u) => !!u.start_dato && u.start_dato >= nyttGrense() && u.start_dato <= data.i_dag;
 
   function dagerIgjen(u) {
     if (!u.slutt_dato || u.slutt_dato < data.i_dag) return null;
@@ -66,9 +66,9 @@
       liste = liste.filter((u) => u.start_dato && u.start_dato > i_dag);
       liste.sort((a, b) => a.start_dato.localeCompare(b.start_dato));
     } else if (visning === 'nytt') {
-      // nyoppdagede som fortsatt henger
+      // nettopp åpnet, og fortsatt oppe
       liste = liste.filter((u) => erNy(u) && (!u.slutt_dato || u.slutt_dato >= i_dag));
-      liste.sort((a, b) => b.forste_gang.localeCompare(a.forste_gang));
+      liste.sort((a, b) => b.start_dato.localeCompare(a.start_dato));
     } else if (visning === 'merket') {
       const m = merker();
       liste = liste.filter((u) => m.includes(u.nokkel));
@@ -136,13 +136,13 @@
     const liste = utvalg();
     if (!liste.length) {
       innhold.innerHTML = visning === 'nytt'
-        ? '<p class="tomt">Ingenting nytt de siste sju dagene.</p>'
+        ? '<p class="tomt">Ingen utstillinger har åpnet de siste sju dagene.</p>'
         : '<p class="tomt">Ingenting her akkurat nå.</p>';
       return;
     }
     const banner = visning === 'nytt'
       ? `<div class="beskjed"><span>${liste.length} ${liste.length === 1 ? 'ny utstilling' : 'nye utstillinger'}
-           dukket opp de siste sju dagene</span></div>` : '';
+           åpnet de siste sju dagene</span></div>` : '';
     innhold.innerHTML = banner + `<div class="rutenett">${liste.map(kort).join('')}</div>`;
   }
 
