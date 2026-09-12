@@ -1,4 +1,5 @@
 import EventKit
+import EventKitUI
 import MapKit
 import SwiftUI
 
@@ -209,6 +210,9 @@ struct DetaljVisning: View {
     @EnvironmentObject private var lager: Lager
     let utstilling: Utstilling
     @State private var kalenderbeskjed: String?
+    @State private var arkiv = EKEventStore()
+    @State private var forslag: EKEvent?
+    @State private var visKalender = false
 
     private var sted: Sted? { lager.sted(for: utstilling.kildeId) }
 
@@ -231,7 +235,11 @@ struct DetaljVisning: View {
                     }
                     Text(utstilling.periode ?? "").font(.subheadline)
                     if let d = utstilling.dagerIgjen(), d <= 14 {
-                        Text(d == 0 ? "Siste dag i dag" : d == 1 ? "Siste dag i morgen" : "\(d) dager igjen")
+                        // Et arrangement har ingen «siste dag» – det skjer den dagen.
+                        Text(utstilling.erArrangement
+                             ? (d == 0 ? "I dag" : d == 1 ? "I morgen" : "Om \(d) dager")
+                             : (d == 0 ? "Siste dag i dag" : d == 1 ? "Siste dag i morgen"
+                                : "\(d) dager igjen"))
                             .font(.subheadline.weight(.semibold)).foregroundStyle(Color.aksent)
                     }
                 }
@@ -259,10 +267,13 @@ struct DetaljVisning: View {
                             Knappetekst(tekst: "Åpne hos \(utstilling.galleri)", ikon: "safari")
                         }
                     }
-                    Button { leggIKalender() } label: {
-                        Knappetekst(tekst: "Legg i kalender", ikon: "calendar.badge.plus")
+                    // Bare arrangementer hører hjemme i kalenderen. En utstilling
+                    // som står i tre måneder er ingen avtale.
+                    if utstilling.erArrangement && utstilling.start != nil {
+                        Button { leggIKalender() } label: {
+                            Knappetekst(tekst: "Foreslå i kalenderen", ikon: "calendar.badge.plus")
+                        }
                     }
-                    .disabled(utstilling.start == nil && utstilling.slutt == nil)
 
                     if let sted, sted.harPosisjon {
                         Button { visIKart(sted) } label: {
@@ -279,6 +290,12 @@ struct DetaljVisning: View {
             .padding()
         }
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $visKalender) {
+            if let forslag {
+                KalenderRedigering(hendelse: forslag, arkiv: arkiv)
+                    .ignoresSafeArea()
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { lager.veksleMerke(utstilling) } label: {
@@ -302,30 +319,60 @@ struct DetaljVisning: View {
         mål.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
     }
 
+    /// Fyller ut et forslag og lar Kalender-appen vise det fram. Ingenting
+    /// havner i kalenderen før du selv trykker «Legg til».
     private func leggIKalender() {
-        let arkiv = EKEventStore()
-        let adresse = sted?.adresse          // hentes her, ikke inne i tilbakekallet
+        let adresse = sted?.adresse
         arkiv.requestWriteOnlyAccessToEvents { fikkLov, _ in
-            guard fikkLov else {
-                DispatchQueue.main.async { kalenderbeskjed = "Appen mangler tilgang til kalenderen." }
-                return
+            DispatchQueue.main.async {
+                guard fikkLov else {
+                    kalenderbeskjed = "Appen mangler tilgang til kalenderen. "
+                        + "Du kan gi den i Innstillinger → Personvern → Kalendere."
+                    return
+                }
+                let hendelse = EKEvent(eventStore: arkiv)
+                hendelse.title = "\(utstilling.tittel) – \(utstilling.galleri)"
+                hendelse.isAllDay = true
+                let fra = utstilling.start ?? utstilling.slutt ?? Date()
+                hendelse.startDate = fra
+                hendelse.endDate = utstilling.slutt ?? fra
+                hendelse.location = adresse
+                hendelse.notes = [utstilling.kunstnere, utstilling.sammendrag, utstilling.url]
+                    .compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: "\n\n")
+                hendelse.calendar = arkiv.defaultCalendarForNewEvents
+                forslag = hendelse
+                visKalender = true
             }
-            let hendelse = EKEvent(eventStore: arkiv)
-            hendelse.title = "\(utstilling.tittel) – \(utstilling.galleri)"
-            hendelse.isAllDay = true
-            let fra = utstilling.start ?? utstilling.slutt ?? Date()
-            hendelse.startDate = fra
-            hendelse.endDate = utstilling.slutt ?? fra
-            hendelse.location = adresse
-            hendelse.notes = [utstilling.kunstnere, utstilling.sammendrag, utstilling.url]
-                .compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: "\n\n")
-            hendelse.calendar = arkiv.defaultCalendarForNewEvents
-            do {
-                try arkiv.save(hendelse, span: .thisEvent)
-                DispatchQueue.main.async { kalenderbeskjed = "Lagt i kalenderen." }
-            } catch {
-                DispatchQueue.main.async { kalenderbeskjed = "Fikk ikke lagret i kalenderen." }
-            }
+        }
+    }
+}
+
+/// Apples egen hendelsesredigerer. Den viser forslaget ferdig utfylt, og
+/// brukeren avgjør selv om det skal lagres.
+struct KalenderRedigering: UIViewControllerRepresentable {
+    let hendelse: EKEvent
+    let arkiv: EKEventStore
+    @Environment(\.dismiss) private var lukk
+
+    func makeUIViewController(context: Context) -> EKEventEditViewController {
+        let vis = EKEventEditViewController()
+        vis.event = hendelse
+        vis.eventStore = arkiv
+        vis.editViewDelegate = context.coordinator
+        return vis
+    }
+
+    func updateUIViewController(_ vis: EKEventEditViewController, context: Context) {}
+
+    func makeCoordinator() -> Ordstyrer { Ordstyrer { lukk() } }
+
+    final class Ordstyrer: NSObject, EKEventEditViewDelegate {
+        private let lukk: () -> Void
+        init(lukk: @escaping () -> Void) { self.lukk = lukk }
+
+        func eventEditViewController(_ vis: EKEventEditViewController,
+                                     didCompleteWith action: EKEventEditViewAction) {
+            lukk()
         }
     }
 }

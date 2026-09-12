@@ -43,7 +43,7 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         UIBackgroundModes: [fetch, processing]
         BGTaskSchedulerPermittedIdentifiers: [no.gladesigner.galleriradar.hent]
-        NSCalendarsWriteOnlyAccessUsageDescription: Brukes til å legge en utstilling i kalenderen din.
+        NSCalendarsWriteOnlyAccessUsageDescription: Brukes til å foreslå et arrangement i kalenderen din. Ingenting lagres uten at du godkjenner det.
         ITSAppUsesNonExemptEncryption: false
 
   GalleriradarWidget:

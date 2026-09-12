@@ -27,7 +27,7 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
-	<string>Brukes til å legge en utstilling i kalenderen din.</string>
+	<string>Brukes til å foreslå et arrangement i kalenderen din. Ingenting lagres uten at du godkjenner det.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
