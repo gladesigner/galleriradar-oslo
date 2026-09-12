@@ -15,14 +15,21 @@ from __future__ import annotations
 import html
 import json
 import os
-import sqlite3
 import re
+import socket
+import sqlite3
 import time
 from urllib.parse import urljoin, urlparse
 
 import requests
 import soupsieve as sv
+import urllib3.util.connection as _tilkobling
 from bs4 import BeautifulSoup
+
+# GitHubs tjenere har ikke IPv6. Slår et navneoppslag ut i en AAAA-adresse først,
+# ender forespørselen som «Network is unreachable» selv om nettstedet er oppe.
+# Vi ber derfor alltid om IPv4.
+_tilkobling.allowed_gai_family = lambda: socket.AF_INET
 
 from datotolk import datostart, tolk_periode
 
