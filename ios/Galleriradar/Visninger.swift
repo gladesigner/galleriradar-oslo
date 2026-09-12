@@ -60,10 +60,9 @@ struct ListeVisning: View {
                 } else {
                     List {
                         if valgt == .nytt {
-                            Section {
-                                Button("Merk alt som sett") { lager.merkAltSomSett() }
-                                    .foregroundStyle(Color.aksent)
-                            }
+                            Text("Dukket opp de siste sju dagene")
+                                .font(.footnote).foregroundStyle(.secondary)
+                                .listRowSeparator(.hidden)
                         }
                         ForEach(liste) { u in
                             NavigationLink(value: u) { Utstillingsrad(utstilling: u) }
@@ -102,7 +101,7 @@ private struct Tomtrom: View {
                 visning == .nytt ? "Ingenting nytt" : "Ingen utstillinger",
                 systemImage: visning == .merket ? "star" : "paintpalette",
                 description: Text(visning == .nytt
-                    ? "Du får varsel når noe dukker opp."
+                    ? "Ingenting nytt de siste sju dagene. Du får varsel når noe dukker opp."
                     : visning == .merket
                         ? "Trykk stjerna på en utstilling for å samle den her."
                         : "Dra ned for å hente på nytt."))

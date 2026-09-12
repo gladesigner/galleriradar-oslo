@@ -12,15 +12,15 @@
   let visning = 'aktuelt';
   let tidsavbrudd = null;
 
-  // Hver telefon husker selv når den sist så listen – da blir «NY» riktig for begge.
-  const sistSett = () => localStorage.getItem('sistSett') || '';
-  const naaLokal = () => {
+  // «Nytt» er en fast luke: i dag og seks dager bakover. Da betyr fanen det
+  // samme uansett hvilken telefon den åpnes på.
+  const NYTT_VINDU = 6;
+  const nyttGrense = () => {
     const d = new Date();
+    d.setDate(d.getDate() - NYTT_VINDU);
     const to = (n) => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${to(d.getMonth() + 1)}-${to(d.getDate())}T` +
-           `${to(d.getHours())}:${to(d.getMinutes())}:${to(d.getSeconds())}`;
+    return `${d.getFullYear()}-${to(d.getMonth() + 1)}-${to(d.getDate())}`;
   };
-  const settSistSett = () => localStorage.setItem('sistSett', naaLokal());
 
   const merker = () => { try { return JSON.parse(localStorage.getItem('merket') || '[]'); } catch { return []; } };
   const erMerket = (n) => merker().includes(n);
@@ -35,7 +35,7 @@
   const trygg = (s) => (s == null ? '' : String(s)).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  const erNy = (u) => { const s = sistSett(); return s ? u.forste_gang > s : false; };
+  const erNy = (u) => (u.forste_gang || '').slice(0, 10) >= nyttGrense();
 
   function dagerIgjen(u) {
     if (!u.slutt_dato || u.slutt_dato < data.i_dag) return null;
@@ -66,6 +66,7 @@
       liste = liste.filter((u) => u.start_dato && u.start_dato > i_dag);
       liste.sort((a, b) => a.start_dato.localeCompare(b.start_dato));
     } else if (visning === 'nytt') {
+      // nyoppdagede som fortsatt henger
       liste = liste.filter((u) => erNy(u) && (!u.slutt_dato || u.slutt_dato >= i_dag));
       liste.sort((a, b) => b.forste_gang.localeCompare(a.forste_gang));
     } else if (visning === 'merket') {
@@ -135,17 +136,14 @@
     const liste = utvalg();
     if (!liste.length) {
       innhold.innerHTML = visning === 'nytt'
-        ? '<p class="tomt">Ingenting nytt siden sist. Du får varsel når noe dukker opp.</p>'
+        ? '<p class="tomt">Ingenting nytt de siste sju dagene.</p>'
         : '<p class="tomt">Ingenting her akkurat nå.</p>';
       return;
     }
     const banner = visning === 'nytt'
-      ? `<div class="beskjed"><span>${liste.length} ${liste.length === 1 ? 'ny utstilling' : 'nye utstillinger'} siden sist</span>
-           <button class="knapp" id="markerLest">Merk som sett</button></div>` : '';
+      ? `<div class="beskjed"><span>${liste.length} ${liste.length === 1 ? 'ny utstilling' : 'nye utstillinger'}
+           dukket opp de siste sju dagene</span></div>` : '';
     innhold.innerHTML = banner + `<div class="rutenett">${liste.map(kort).join('')}</div>`;
-
-    const lest = document.getElementById('markerLest');
-    if (lest) lest.onclick = () => { settSistSett(); tegn(); };
   }
 
   function fyllGallerier() {
@@ -162,7 +160,6 @@
     oppdaterKnapp.classList.add('gaar');
     try {
       data = await fetch(`data.json?t=${Date.now()}`).then((r) => r.json());
-      if (!sistSett()) settSistSett();   // første besøk: alt regnes som sett
       fyllGallerier();
       const hentet = (data.bygget || '').replace('T', ' kl. ').slice(0, 16);
       bunntekst.textContent =

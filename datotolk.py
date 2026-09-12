@@ -122,17 +122,22 @@ def tolk_periode(tekst: str | None, hint_ar: int | None = None) -> tuple[str | N
     if not tekst:
         return None, None
     t = re.sub(r"\s+", " ", str(tekst)).strip()
+    raa = t                       # før klokkeslettene fjernes
     # klokkeslett ser ut som datoer for en maskin – «kl. 21:15-02:00» må bort først
     t = re.sub(r"\bkl\.?\s*\d{1,2}[:.]\d{2}(?:\s*[-–—]\s*\d{1,2}[:.]\d{2})?", " ", t, flags=re.IGNORECASE)
     t = re.sub(r"\b\d{1,2}:\d{2}\s*[-–—]\s*\d{1,2}:\d{2}\b", " ", t)
-    t = re.sub(r"\s+", " ", t).strip(" –—-,")
+    # NB: strekene må stå. En hale som «27.05.2025 —» er nettopp det som
+    # skiller en pågående utstilling fra en som varte én dag.
+    t = re.sub(r"\s+", " ", t).strip(" ,")
     if not t:
         return None, None
 
     apen_start = bool(_RE_APEN_START.match(t))
     apen_hode = bool(re.match(r"^\s*[–—−-]\s*\d", t))   # «— 19.09» = startet før
     apen_slutt = bool(_RE_APEN_SLUTT.search(t))
-    apen_hale = bool(re.search(r"[–—−-]\s*$", t))       # «27.05.2025 —» = går fortsatt
+    # «27.05.2025 —» betyr at utstillingen går videre. Streken må stå i
+    # originalteksten – ellers er det bare en rest etter et fjernet klokkeslett.
+    apen_hale = bool(re.search(r"[–—−-]\s*$", raa))
 
     # Del på skilletegn, men bare når det faktisk skiller to datoer
     deler = SKILLETEGN.split(t)

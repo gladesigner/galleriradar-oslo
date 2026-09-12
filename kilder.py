@@ -66,14 +66,19 @@ KILDER: list[dict] = [
     {
         "id": "hok", "region": "oslo", "navn": "Henie Onstad Kunstsenter", "kategori": "museum",
         "bydel": "Høvikodden", "url": "https://www.hok.no/",
-        "sider": ["https://www.hok.no/utstillinger"],
-        "element": "article.grid-item",
-        "tittel": "h3|h2",
-        "kunstnere": "h2",
-        "dato": ".f-sm|time|.date",
-        "url_monster": r"/utstillinger/",
         "adresse": "Sonja Henies vei 31, 1311 Høvikodden",
         "lat": 59.88864, "lon": 10.55349,
+        # /utstillinger er et arkiv med gamle utstillinger. Det som går nå
+        # ligger under /program.
+        "sider": ["https://www.hok.no/program"],
+        "element": "article.grid-item",
+        "tittel": "h3",
+        "kunstnere": ".f-sm",
+        "url_monster": r"/utstillinger/",
+        # Oversikten har ingen datoer i det hele tatt – de står på hver
+        # utstillingsside, i feltet over tittelen.
+        "detalj": True,
+        "detalj_dato": ".sticky span.block|.grid-wrap span.block|span.block",
     },
     {
         "id": "vigeland", "region": "oslo", "navn": "Vigeland-museet", "kategori": "museum",

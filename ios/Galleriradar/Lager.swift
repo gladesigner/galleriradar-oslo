@@ -19,11 +19,6 @@ final class Lager: ObservableObject {
 
     init() {
         merket = Set(UserDefaults.standard.stringArray(forKey: "merket") ?? [])
-        // Første gang appen åpnes regnes alt som sett – ellers ville hele
-        // listen ha lyst opp som ny.
-        if UserDefaults.standard.double(forKey: "sistSett") == 0 {
-            UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: "sistSett")
-        }
         lesFraDisk()
     }
 
@@ -56,25 +51,20 @@ final class Lager: ObservableObject {
         }
     }
 
-    // MARK: hva denne telefonen har sett
+    // MARK: hva som regnes som nytt
 
-    /// Settes første gang appen åpnes, så ikke hele basen lyser opp som ny.
-    var sistSett: Date {
-        get {
-            let t = UserDefaults.standard.double(forKey: "sistSett")
-            return t > 0 ? Date(timeIntervalSince1970: t) : .distantPast
-        }
-        set { UserDefaults.standard.set(newValue.timeIntervalSince1970, forKey: "sistSett") }
-    }
+    /// «Nytt» er en fast luke: i dag og seks dager bakover. Da betyr fanen det
+    /// samme uansett hvilken telefon den åpnes på, og uansett hvor lenge det er
+    /// siden sist noen så på listen.
+    static let nyttVindu = 6
 
-    func merkAltSomSett() {
-        sistSett = Date()
-        objectWillChange.send()
+    var nyttGrense: String {
+        let dato = Calendar.current.date(byAdding: .day, value: -Self.nyttVindu, to: Date()) ?? Date()
+        return Dato.tekst(dato)
     }
 
     func erNy(_ u: Utstilling) -> Bool {
-        guard let sett = Varsler.tidspunkt(u.forsteGang) else { return false }
-        return sett > sistSett
+        String(u.forsteGang.prefix(10)) >= nyttGrense
     }
 
     // MARK: «vil se»
@@ -111,6 +101,8 @@ final class Lager: ObservableObject {
             liste = data.utstillinger.filter { ($0.startDato ?? "") > iDag }
             liste.sort { ($0.startDato ?? "") < ($1.startDato ?? "") }
         case .nytt:
+            // nyoppdagede som fortsatt henger – det som allerede er tatt ned
+            // hjelper ingen å vite om
             liste = data.utstillinger.filter { erNy($0) && ($0.sluttDato == nil || $0.sluttDato! >= iDag) }
             liste.sort { $0.forsteGang > $1.forsteGang }
         case .merket:
