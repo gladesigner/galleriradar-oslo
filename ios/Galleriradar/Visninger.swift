@@ -48,9 +48,9 @@ struct Hovedvisning: View {
                 .tabItem { Label("Utstillinger", systemImage: "square.grid.2x2") }
                 .badge(lager.antall(.nytt))
 
-            ListeVisning(fast: .arrangement)
+            KalenderVisning()
                 .tag(1)
-                .tabItem { Label("Arrangement", systemImage: "calendar") }
+                .tabItem { Label("Kalender", systemImage: "calendar") }
 
             KartVisning()
                 .tag(2)

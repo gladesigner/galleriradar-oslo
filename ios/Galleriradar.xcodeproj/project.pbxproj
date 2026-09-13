@@ -10,6 +10,7 @@
 		23D0416C79FB78063DA75662 /* Lager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD972A721E8F29269363C06 /* Lager.swift */; };
 		4C5F417BC46179E27A3B7171 /* Modell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77488A314CFC63CE435A53A2 /* Modell.swift */; };
 		509DADB9E848A628372979C9 /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C189A7D98D50BA396D408DD /* Widget.swift */; };
+		5B1134A921F4688DC6193012 /* Kalender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60625B00CC318BADCD77CC0A /* Kalender.swift */; };
 		7273E64BEB8FD4819135FCBF /* GalleriradarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F702BCB3125301717E1F722D /* GalleriradarApp.swift */; };
 		A47B3B24382B02AB574CD226 /* Varsler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E63BB461A0099B9B794576F /* Varsler.swift */; };
 		A9BC1F418B45A21DBAC4ACBD /* Visninger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E999EAFDA217AAC53D61ABE7 /* Visninger.swift */; };
@@ -49,6 +50,7 @@
 		0E63BB461A0099B9B794576F /* Varsler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Varsler.swift; sourceTree = "<group>"; };
 		2BDF2422CAA83F6857ED1AB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4BD972A721E8F29269363C06 /* Lager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lager.swift; sourceTree = "<group>"; };
+		60625B00CC318BADCD77CC0A /* Kalender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kalender.swift; sourceTree = "<group>"; };
 		77488A314CFC63CE435A53A2 /* Modell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modell.swift; sourceTree = "<group>"; };
 		C21664D70A22BB1E678C1EBA /* GalleriradarWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = GalleriradarWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA85C0410FE7CE675C9A7664 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -65,6 +67,7 @@
 				CA85C0410FE7CE675C9A7664 /* Assets.xcassets */,
 				F702BCB3125301717E1F722D /* GalleriradarApp.swift */,
 				2BDF2422CAA83F6857ED1AB1 /* Info.plist */,
+				60625B00CC318BADCD77CC0A /* Kalender.swift */,
 				4BD972A721E8F29269363C06 /* Lager.swift */,
 				77488A314CFC63CE435A53A2 /* Modell.swift */,
 				0E63BB461A0099B9B794576F /* Varsler.swift */,
@@ -206,6 +209,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7273E64BEB8FD4819135FCBF /* GalleriradarApp.swift in Sources */,
+				5B1134A921F4688DC6193012 /* Kalender.swift in Sources */,
 				23D0416C79FB78063DA75662 /* Lager.swift in Sources */,
 				4C5F417BC46179E27A3B7171 /* Modell.swift in Sources */,
 				A47B3B24382B02AB574CD226 /* Varsler.swift in Sources */,

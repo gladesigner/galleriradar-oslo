@@ -177,6 +177,47 @@ final class Lager: ObservableObject {
 
     func antall(_ visning: Visning) -> Int { utstillinger(visning).count }
 
+    // MARK: kalender
+
+    /// Datoene som har noe eget ved seg: et arrangement, en åpning eller en
+    /// siste dag. Det er de prikkene i månedsrutenettet peker på.
+    func dagerMedNoe() -> Set<String> {
+        var ut = Set<String>()
+        for u in data.utstillinger where erPaa(u.kildeId) {
+            if u.erArrangement {
+                if let d = u.startDato { ut.insert(d) }
+            } else {
+                if let d = u.startDato { ut.insert(d) }
+                if let d = u.sluttDato { ut.insert(d) }
+            }
+        }
+        return ut
+    }
+
+    struct Dagsprogram {
+        var arrangementer: [Utstilling] = []
+        var apner: [Utstilling] = []
+        var slutter: [Utstilling] = []
+        var erTom: Bool { arrangementer.isEmpty && apner.isEmpty && slutter.isEmpty }
+    }
+
+    /// Hva som knytter seg til én bestemt dag.
+    func paaDato(_ iso: String) -> Dagsprogram {
+        var p = Dagsprogram()
+        for u in data.utstillinger where erPaa(u.kildeId) {
+            if u.erArrangement {
+                if u.startDato == iso { p.arrangementer.append(u) }
+            } else {
+                if u.startDato == iso { p.apner.append(u) }
+                if u.sluttDato == iso { p.slutter.append(u) }
+            }
+        }
+        p.arrangementer.sort { ($0.fraTid ?? "99:99", $0.tittel) < ($1.fraTid ?? "99:99", $1.tittel) }
+        p.apner.sort { $0.galleri.localizedCaseInsensitiveCompare($1.galleri) == .orderedAscending }
+        p.slutter.sort { $0.galleri.localizedCaseInsensitiveCompare($1.galleri) == .orderedAscending }
+        return p
+    }
+
     /// Alt et sted har på plakaten nå: utstillinger først, så arrangementer.
     func paaSted(_ kildeId: String) -> (utstillinger: [Utstilling], arrangementer: [Utstilling]) {
         (utstillinger(.naa, sted: kildeId) + utstillinger(.fast, sted: kildeId),

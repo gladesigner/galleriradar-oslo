@@ -157,6 +157,16 @@ enum Dato {
                                      second: 0, of: dag)
     }
 
+    /// «Lørdag 13. september 2026» – overskriften i kalenderen.
+    static func langDagtekst(_ iso: String) -> String {
+        guard let d = fra(iso) else { return iso }
+        let ut = DateFormatter()
+        ut.locale = Locale(identifier: "nb_NO")
+        ut.dateFormat = "EEEE d. MMMM yyyy"
+        let s = ut.string(from: d)
+        return s.prefix(1).uppercased() + s.dropFirst()
+    }
+
     /// «2026-09-12T18:25:45» → «12. september kl. 18.25»
     static func lesbart(_ tidspunkt: String) -> String {
         let inn = DateFormatter()

@@ -509,15 +509,15 @@ KILDER: list[dict] = [
         "dato": "time|.date|p",
         "detalj": True, "krev_dato": True, "maks": 20,
     },
-    {
-        "id": "detgulehuset", "region": "ostlandet", "navn": "Det Gule Huset", "kategori": "galleri",
-        "bydel": "Asker", "url": "https://www.detgulehuset.no/",
+        {
+        # Forsiden skrives for hånd i én tekstblokk, med tittelen utenfor
+        # lenken. Utstillingssiden er et arkiv over alt som har vært siden
+        # 1980. Begge deler krever en egen funksjon – se egne.py.
+        "id": "detgulehuset", "region": "ostlandet", "navn": "Det Gule Huset",
+        "kategori": "galleri", "bydel": "Asker",
+        "url": "https://www.detgulehuset.no/",
         "adresse": "Devikveien 1, 1394 Nesbru", "lat": 59.85529, "lon": 10.49122,
-        "sider": ["https://www.detgulehuset.no/utstillinger-1"],
-        "element": "a[href], article", "lenke": "self",
-        "tittel": "h2|h3|self",
-        "dato": "time|.date|self",
-        "url_monster": r"detgulehuset\.no/[a-z0-9-]{5,}",
+        "type_adapter": "funk", "funksjon": "detgulehuset",
         "detalj": True, "krev_dato": True, "maks": 20,
     },
 

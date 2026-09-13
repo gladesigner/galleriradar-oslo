@@ -199,6 +199,18 @@ def _fra_srcset(srcset: str) -> list[tuple[int, str]]:
     return ut
 
 
+_RE_BAKGRUNN = re.compile(r"""background(?:-image)?\s*:[^;]*url\(\s*['"]?([^'")]+)""",
+                          re.IGNORECASE)
+
+
+def _bakgrunnsbilde(rot, basis: str) -> str:
+    for el in rot.select("[style*='background']"):
+        m = _RE_BAKGRUNN.search(el.get("style") or "")
+        if m and not m.group(1).startswith("data:"):
+            return urljoin(basis, m.group(1).strip())
+    return ""
+
+
 def _bilde(rot, velger: str | None, basis: str) -> str:
     """Finner det største fornuftige bildet i et element.
 
@@ -210,7 +222,9 @@ def _bilde(rot, velger: str | None, basis: str) -> str:
     if el is None:
         el = rot.select_one("img")
     if el is None:
-        return ""
+        # Noen legger bildet i en CSS-bakgrunn i stedet for et img-element.
+        # Nitja gjør det, og da finnes det ikke noe bilde å lete i.
+        return _bakgrunnsbilde(rot, basis)
 
     kandidater: list[tuple[int, str]] = []
     for kilde in [el] + rot.select("source"):
@@ -224,7 +238,7 @@ def _bilde(rot, velger: str | None, basis: str) -> str:
 
     kandidater = [(b, u) for b, u in kandidater if u and not u.startswith("data:")]
     if not kandidater:
-        return ""
+        return _bakgrunnsbilde(rot, basis)
     med_bredde = [k for k in kandidater if k[0] > 0]
     if med_bredde:
         brukbare = [k for k in med_bredde if k[0] <= 2000] or med_bredde
