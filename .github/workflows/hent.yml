@@ -14,11 +14,14 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  # En ny innhøsting er alltid bedre enn en gammel som står fast. Uten dette
+  # blokkerte en kjøring som ble hengende i kø alle de neste i timevis.
+  cancel-in-progress: true
 
 jobs:
   bygg:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
