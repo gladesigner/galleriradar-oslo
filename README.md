@@ -52,6 +52,26 @@ også uten dekning. Hver telefon husker selv når den sist så listen, så «NY�
 riktig for begge to uavhengig av hverandre. Stjernemerkene ligger også lokalt på
 hver telefon.
 
+## Sju dager om gangen
+
+Den native appen signeres med gratis utviklerkonto, og en slik signatur varer
+bare sju dager. `ios/forny.sh` gjør det om til noe ingen trenger å huske:
+
+```
+./ios/forny.sh            # vanlig runde – signerer det som nærmer seg utløp
+./ios/forny.sh --tving    # signer på nytt uansett
+./ios/forny.sh --status   # hvem ble sist fornyet, og hvor lenge den varer
+```
+
+`~/Library/LaunchAgents/no.gladesigner.galleriradar.forny.plist` kjører den
+03.30 hver natt. Jobben leter etter telefonene på nettet, hopper over dem som
+ikke er der, og bygger bare når det faktisk trengs – på femte dag, med to dagers
+margin. Installasjonen skriver over den gamle appen, så Min liste og
+kildevalgene står. Logg: `~/Library/Application Support/Galleriradar/forny.log`.
+
+Nye telefoner legges til i `TELEFONER` øverst i skriptet, med navnet slik
+`xcrun devicectl list devices` skriver det.
+
 ## Kjøre lokalt
 
     .venv/bin/python -m pip install -r krav.txt
