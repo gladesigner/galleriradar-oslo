@@ -17,6 +17,7 @@
 		B34C79EA3F205129913ABEF9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0046414B61A59B7081E8A92E /* Assets.xcassets */; };
 		BE0A888C99FCCDF9A4BCA1B9 /* GalleriradarWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C21664D70A22BB1E678C1EBA /* GalleriradarWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CB743E88A4FBB48F908A2337 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CA85C0410FE7CE675C9A7664 /* Assets.xcassets */; };
+		D46866C0F1E2126CC8722BFB /* Nettvindu.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE8A683F828D39D85CEABF5 /* Nettvindu.swift */; };
 		E33A441C397B765E71F069F5 /* Modell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77488A314CFC63CE435A53A2 /* Modell.swift */; };
 /* End PBXBuildFile section */
 
@@ -56,6 +57,7 @@
 		CA85C0410FE7CE675C9A7664 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D86D851D1BDABE1203969484 /* Galleriradar.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Galleriradar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E999EAFDA217AAC53D61ABE7 /* Visninger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Visninger.swift; sourceTree = "<group>"; };
+		EEE8A683F828D39D85CEABF5 /* Nettvindu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Nettvindu.swift; sourceTree = "<group>"; };
 		F702BCB3125301717E1F722D /* GalleriradarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleriradarApp.swift; sourceTree = "<group>"; };
 		FFB4435BA80B78A8A67EBC2A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -70,6 +72,7 @@
 				60625B00CC318BADCD77CC0A /* Kalender.swift */,
 				4BD972A721E8F29269363C06 /* Lager.swift */,
 				77488A314CFC63CE435A53A2 /* Modell.swift */,
+				EEE8A683F828D39D85CEABF5 /* Nettvindu.swift */,
 				0E63BB461A0099B9B794576F /* Varsler.swift */,
 				E999EAFDA217AAC53D61ABE7 /* Visninger.swift */,
 			);
@@ -212,6 +215,7 @@
 				5B1134A921F4688DC6193012 /* Kalender.swift in Sources */,
 				23D0416C79FB78063DA75662 /* Lager.swift in Sources */,
 				4C5F417BC46179E27A3B7171 /* Modell.swift in Sources */,
+				D46866C0F1E2126CC8722BFB /* Nettvindu.swift in Sources */,
 				A47B3B24382B02AB574CD226 /* Varsler.swift in Sources */,
 				A9BC1F418B45A21DBAC4ACBD /* Visninger.swift in Sources */,
 			);

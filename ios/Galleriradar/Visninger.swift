@@ -218,6 +218,7 @@ struct DetaljVisning: View {
     @State private var kalenderbeskjed: String?
     @State private var arkiv = EKEventStore()
     @State private var forslag: EKEvent?
+    @State private var nettside: Nettadresse?
     @State private var visKalender = false
 
     private var sted: Sted? { lager.sted(for: utstilling.kildeId) }
@@ -269,8 +270,10 @@ struct DetaljVisning: View {
                             fylt: lager.erMerket(utstilling))
                     }
 
-                    if let lenke = utstilling.lenke {
-                        Link(destination: lenke) {
+                    // Siden åpnes oppå appen, ikke i Safari. Da mister man
+                    // ikke plassen sin i listen.
+                    if let adresse = Nettadresse(utstilling.lenke) {
+                        Button { nettside = adresse } label: {
                             Knappetekst(tekst: "Åpne hos \(utstilling.galleri)", ikon: "safari")
                         }
                     }
@@ -297,6 +300,9 @@ struct DetaljVisning: View {
             .padding()
         }
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $nettside) { a in
+            Nettvindu(adresse: a.url).ignoresSafeArea()
+        }
         .sheet(isPresented: $visKalender) {
             if let forslag {
                 KalenderRedigering(hendelse: forslag, arkiv: arkiv)
