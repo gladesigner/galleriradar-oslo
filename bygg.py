@@ -117,6 +117,9 @@ def flett(ferske: list[dict], forrige: dict,
     # Kilder som feilet denne gangen sier ingenting om hva som fortsatt henger.
     # Utstillingene deres får stå som de sto, i stedet for å bli meldt avsluttet.
     stumme = {k["id"] for k in (status or []) if k.get("feil") or not k.get("antall")}
+    # Et sted kan bytte region eller navn. Rader som blir liggende må følge
+    # med, ellers henger gamle utstillinger igjen i feil landsdel.
+    steder = {k["id"]: k for k in (status or [])}
 
     ut: dict[str, dict] = {}
     nye: list[dict] = []
@@ -138,6 +141,11 @@ def flett(ferske: list[dict], forrige: dict,
         if (gammel.get("slutt_dato") or gammel.get("start_dato") or "9999") < grense:
             continue
         gammel = dict(gammel)
+        sted = steder.get(gammel.get("kilde_id"))
+        if sted:
+            gammel["galleri"] = sted["navn"]
+            for felt in ("region", "kategori", "bydel"):
+                gammel[felt] = sted.get(felt) or gammel.get(felt, "")
         gammel["borte"] = gammel.get("borte", False) if gammel.get("kilde_id") in stumme else True
         ut[nokkel] = gammel
 

@@ -16,7 +16,8 @@ Nye gallerier legges til ved å skrive en ny ordbok her. Test med:
 """
 
 REGIONER = {
-    "oslo":       "Oslo og Østlandet",
+    "oslo":       "Oslo",
+    "ostlandet":  "Østlandet",
     "sorlandet":  "Sørlandet",
     "vestlandet": "Bergen og Vestlandet",
     "midt":       "Trondheim og Midt-Norge",
@@ -466,9 +467,9 @@ KILDER: list[dict] = [
     },
     # ──────────────── Østlandet utenfor Oslo ────────────────
     {
-        "id": "gallerif15", "region": "oslo", "navn": "Galleri F 15", "kategori": "kunsthall",
+        "id": "gallerif15", "region": "ostlandet", "navn": "Galleri F 15", "kategori": "kunsthall",
         "bydel": "Moss", "url": "https://gallerif15.no/",
-        "adresse": "Albyalleen 60, 1519 Moss",
+        "adresse": "Albyalleen 60, 1519 Moss", "lat": 59.42419, "lon": 10.61036,
         "sider": ["https://gallerif15.no/exhibitions_f15/",
                   "https://gallerif15.no/exhibitions_momentum/"],
         "element": "a[href*='/exhibitions_']", "lenke": "self",
@@ -478,10 +479,10 @@ KILDER: list[dict] = [
         "detalj": True, "detalj_dato": ".is-date|time", "krev_dato": True, "maks": 25,
     },
     {
-        "id": "kunsthallgrenland", "region": "oslo", "navn": "Kunsthall Grenland",
+        "id": "kunsthallgrenland", "region": "ostlandet", "navn": "Kunsthall Grenland",
         "kategori": "kunsthall", "bydel": "Porsgrunn",
         "url": "https://kunsthallgrenland.no/",
-        "adresse": "Ælvespeilet, Kverndalsgata 8, 3717 Skien",
+        "adresse": "Ælvespeilet, Storgata 164, 3915 Porsgrunn", "lat": 59.14192, "lon": 9.65532,
         "element": ".wp-block-column",
         "tittel": "h2|h3|.wp-block-heading",
         "dato": "time|p|self",
@@ -489,9 +490,9 @@ KILDER: list[dict] = [
         "krev_dato": True, "maks": 20,
     },
     {
-        "id": "kistefos", "region": "oslo", "navn": "Kistefos", "kategori": "museum",
+        "id": "kistefos", "region": "ostlandet", "navn": "Kistefos", "kategori": "museum",
         "bydel": "Jevnaker", "url": "https://www.kistefosmuseum.com/",
-        "adresse": "Samsmoveien 41, 3520 Jevnaker",
+        "adresse": "Samsmoveien 41, 3520 Jevnaker", "lat": 60.22417, "lon": 10.37153,
         "element": "article, .card, li",
         "tittel": "h2|h3|.title",
         "dato": "time|.date|p",
@@ -499,18 +500,19 @@ KILDER: list[dict] = [
         "detalj": True, "krev_dato": True, "maks": 20,
     },
     {
-        "id": "ostfoldkunstsenter", "region": "oslo", "navn": "Østfold kunstsenter",
+        "id": "ostfoldkunstsenter", "region": "ostlandet", "navn": "Østfold kunstsenter",
         "kategori": "kunsthall", "bydel": "Fredrikstad",
         "url": "https://www.ostfold-kunstsenter.no/",
-        "adresse": "Tollbodgaten 105, 1632 Gamle Fredrikstad",
+        "adresse": "Tollbodgaten 105, 1632 Gamle Fredrikstad", "lat": 59.20482, "lon": 10.95385,
         "element": "article, .card, li",
         "tittel": "h2|h3|.entry-title",
         "dato": "time|.date|p",
         "detalj": True, "krev_dato": True, "maks": 20,
     },
     {
-        "id": "detgulehuset", "region": "oslo", "navn": "Det Gule Huset", "kategori": "galleri",
-        "bydel": "Fredrikstad", "url": "https://www.detgulehuset.no/",
+        "id": "detgulehuset", "region": "ostlandet", "navn": "Det Gule Huset", "kategori": "galleri",
+        "bydel": "Asker", "url": "https://www.detgulehuset.no/",
+        "adresse": "Devikveien 1, 1394 Nesbru", "lat": 59.85529, "lon": 10.49122,
         "sider": ["https://www.detgulehuset.no/utstillinger-1"],
         "element": "a[href], article", "lenke": "self",
         "tittel": "h2|h3|self",
@@ -524,7 +526,7 @@ KILDER: list[dict] = [
         "id": "kuk", "region": "midt", "navn": "K.U.K – Kjøpmannsgata Ung Kunst",
         "kategori": "kunsthall", "bydel": "Trondheim",
         "url": "https://www.k-u-k.no/",
-        "adresse": "Kjøpmannsgata 46, 7010 Trondheim",
+        "adresse": "Kjøpmannsgata 46, 7010 Trondheim", "lat": 63.43237, "lon": 10.40257,
         "sider": ["https://www.k-u-k.no/utstillinger/"],
         "element": ".et_pb_blurb, .et_pb_text, article",
         "tittel": "h2.et_pb_module_header|h2|h3|h4",
@@ -534,9 +536,9 @@ KILDER: list[dict] = [
         "maks": 20,
     },
     {
-        "id": "nitja", "region": "oslo", "navn": "Nitja senter for samtidskunst",
+        "id": "nitja", "region": "ostlandet", "navn": "Nitja senter for samtidskunst",
         "kategori": "kunsthall", "bydel": "Lillestrøm",
-        "url": "https://nitja.no/", "adresse": "Storgata 30, 2000 Lillestrøm",
+        "url": "https://nitja.no/", "adresse": "Storgata 30, 2000 Lillestrøm", "lat": 59.95860, "lon": 11.04834,
         "sider": ["https://nitja.no/current-upcoming"],
         "js": "main a",
         "element": "main a[href*='/exhibitions/']", "lenke": "self",
@@ -546,10 +548,10 @@ KILDER: list[dict] = [
         "maks": 20,
     },
     {
-        "id": "kunsthalldikemark", "region": "oslo", "navn": "Kunsthall Dikemark",
+        "id": "kunsthalldikemark", "region": "ostlandet", "navn": "Kunsthall Dikemark",
         "kategori": "kunsthall", "bydel": "Asker",
         "url": "https://www.kunsthalldikemark.no/",
-        "adresse": "Dikemark, 1385 Asker",
+        "adresse": "Dikemark, 1385 Asker", "lat": 59.81331, "lon": 10.36544,
         "element": "article, .post, .card, .entry",
         "tittel": "h2|h3|.entry-title",
         "dato": "time|.date|.entry-date|p|self",
@@ -559,7 +561,7 @@ KILDER: list[dict] = [
     # bruker samme oppsett: bloggliste med dato i brødteksten, så «krev_periode»
     # holder publiseringsdatoene ute.
     {
-        "id": "mosskunstforening", "region": "oslo", "navn": "Moss Kunstforening",
+        "id": "mosskunstforening", "region": "ostlandet", "navn": "Moss Kunstforening",
         "kategori": "kunstforening", "bydel": "Moss",
         "url": "https://www.mosskunstforening.no/",
         "adresse": "Chrysties gate 1, 1530 Moss", "lat": 59.4349, "lon": 10.66284,

@@ -119,8 +119,8 @@ struct Datasett: Codable {
                               utstillinger: [], regioner: nil)
 
     /// Regionene i rekkefølgen de skal stå i en liste – sørfra og nordover.
-    static let regionrekke = ["oslo", "sorlandet", "vestlandet", "midt",
-                              "nordland", "troms", "finnmark"]
+    static let regionrekke = ["oslo", "ostlandet", "sorlandet", "vestlandet",
+                              "midt", "nordland", "troms", "finnmark"]
 
     func regionNavn(_ id: String) -> String { regioner?[id] ?? id }
 

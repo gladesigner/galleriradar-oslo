@@ -188,12 +188,21 @@
   }
 
   function fyllGallerier() {
-    const navn = new Map();
-    for (const u of data.utstillinger) navn.set(u.kilde_id, u.galleri);
+    // Stedene grupperes etter landsdel. Med 45 visningssteder er en flat
+    // liste vanskelig å finne fram i.
+    const steder = new Map();
+    for (const u of data.utstillinger) {
+      if (!steder.has(u.kilde_id)) steder.set(u.kilde_id, { navn: u.galleri, region: u.region || 'oslo' });
+    }
+    const regioner = data.regioner || {};
+    const rekke = Object.keys(regioner).filter((r) => [...steder.values()].some((s) => s.region === r));
     const valgt = galleriFelt.value;
-    galleriFelt.innerHTML = '<option value="">Alle steder</option>' +
-      [...navn.entries()].sort((a, b) => a[1].localeCompare(b[1], 'nb'))
-        .map(([id, n]) => `<option value="${trygg(id)}">${trygg(n)}</option>`).join('');
+    galleriFelt.innerHTML = '<option value="">Alle steder</option>' + rekke.map((r) => {
+      const i = [...steder.entries()].filter(([, s]) => s.region === r)
+        .sort((a, b) => a[1].navn.localeCompare(b[1].navn, 'nb'))
+        .map(([id, s]) => `<option value="${trygg(id)}">${trygg(s.navn)}</option>`).join('');
+      return `<optgroup label="${trygg(regioner[r])}">${i}</optgroup>`;
+    }).join('');
     galleriFelt.value = valgt;
   }
 

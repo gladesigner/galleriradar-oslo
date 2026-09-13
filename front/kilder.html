@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kilder – Galleriradar Oslo</title>
 <link rel="icon" href="ikon-192.png">
-<link rel="stylesheet" href="stil.css?v=2">
+<link rel="stylesheet" href="stil.css?v=3">
 </head>
 <body>
 <header class="topp">
@@ -30,7 +30,12 @@ fetch('data.json?t=' + Date.now()).then((r) => r.json()).then((d) => {
       <td class="h">${k.antall}</td>
       <td class="dempet">${k.feil || (k.antall ? '' : 'ingen treff')}</td>
     </tr>`;
-  document.getElementById('kildekropp').innerHTML = d.kilder.map(rad).join('');
+  // Én bolk per landsdel, i samme rekkefølge som regionene står i data.json.
+  const regioner = d.regioner || {};
+  const rekke = Object.keys(regioner).filter((r) => d.kilder.some((k) => (k.region || 'oslo') === r));
+  document.getElementById('kildekropp').innerHTML = rekke.map((r) =>
+    `<tr class="rad--bolk"><th colspan="4">${regioner[r]}</th></tr>`
+    + d.kilder.filter((k) => (k.region || 'oslo') === r).map(rad).join('')).join('');
   document.getElementById('bygget').textContent =
     'Sist hentet ' + d.bygget.replace('T', ' kl. ').slice(0, 19);
 });

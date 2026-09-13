@@ -153,3 +153,14 @@ main { flex: 1 0 auto; padding: 1rem; max-width: 1180px; width: 100%; margin: 0 
 .rad--feil td { background: color-mix(in srgb, var(--aksent) 8%, transparent); }
 .rad--tom td { background: color-mix(in srgb, var(--dempet) 8%, transparent); }
 code { font-size: .85em; background: var(--aksent-svak); padding: .1rem .3rem; border-radius: 4px; }
+
+/* Kildetabellen deles i landsdeler. */
+.rad--bolk th {
+  padding: 1.4rem 0 .4rem;
+  text-align: left;
+  font-size: .8rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--aksent);
+  border-bottom: 1px solid var(--strek);
+}
