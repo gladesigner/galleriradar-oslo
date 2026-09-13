@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# Fornyer signaturen på Galleriradar før de sju dagene er ute.
+# Holder Galleriradar levende på telefonene.
 #
 # Gratis utviklerkonto signerer bare for sju dager. Denne jobben kjører hver
-# natt, ser etter telefonene på nettet, og signerer på nytt når det nærmer seg.
-# Installasjonen skriver over den gamle appen – listen og kildevalgene står.
+# natt, ser etter telefonene på nettet, og installerer på nytt når signaturen
+# nærmer seg slutten – eller når koden er endret siden sist. Installasjonen
+# skriver over den gamle appen; listen og kildevalgene står.
 #
 #   ./forny.sh            vanlig runde
-#   ./forny.sh --tving    signer på nytt selv om det ikke haster
-#   ./forny.sh --status   hvem ble sist fornyet, og når
+#   ./forny.sh --tving    installer på nytt selv om det ikke haster
+#   ./forny.sh --status   hvem fikk sist en ny installasjon, og når
 set -uo pipefail
 
 TELEFONER=("Trondofon" "Marte")
@@ -65,8 +66,12 @@ PY
   merke="$STAT/sist-$navn"
   if [[ $tving -eq 0 && -f "$merke" ]]; then
     alder=$(( ($(date +%s) - $(stat -f %m "$merke")) / 86400 ))
-    if (( alder < DAGER )); then
-      continue                        # signaturen holder noen dager til
+    # Er koden endret siden sist, skal den ut selv om signaturen holder.
+    # Ellers ville en ny versjon blitt liggende til signaturen løp ut.
+    endret=$(find "$PROSJEKT" -name '*.swift' -o -name 'project.yml' \
+             -o -name '*.png' 2>/dev/null | xargs -I{} find {} -newer "$merke" 2>/dev/null | head -1)
+    if (( alder < DAGER )) && [[ -z "$endret" ]]; then
+      continue                        # signaturen holder, og ingenting er nytt
     fi
   fi
 
