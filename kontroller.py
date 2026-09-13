@@ -24,7 +24,7 @@ def datoer_på_siden(url: str, kilde: dict, hint_ar: int | None = None) -> set[s
     dag og måned – ellers ville «6. juni» alltid blitt lest som i år."""
     try:
         r = hent_side(url, forsok=1, hoder=kilde.get("hoder"),
-                      reserve=kilde.get("reserve", False))
+                      reserve=kilde.get("reserve", False), js=kilde.get("js", False))
     except Hentefeil:
         return None
     s = _suppe(r)
@@ -51,8 +51,12 @@ def kontroller(rader: list[dict], parallelle: int = 6) -> list[dict]:
         return {**u, "dom": "avvik", "mangler": mangler,
                 "påsiden": sorted(funnet)[:6]}
 
+    # Nettleserkildene må gå etter tur – Playwright tåler bare én tråd.
+    i_nettleser = [u for u in rader if KILDE_ETTER_ID.get(u["kilde_id"], {}).get("js")]
+    vanlige = [u for u in rader if not KILDE_ETTER_ID.get(u["kilde_id"], {}).get("js")]
     with ThreadPoolExecutor(parallelle) as ex:
-        return list(ex.map(en, rader))
+        svar = list(ex.map(en, vanlige))
+    return svar + [en(u) for u in i_nettleser]
 
 
 if __name__ == "__main__":

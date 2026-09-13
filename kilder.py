@@ -555,6 +555,51 @@ KILDER: list[dict] = [
         "dato": "time|.date|.entry-date|p|self",
         "detalj": True, "krev_periode": True, "maks": 15,
     },
+    # Fire fra Enhetsregisteret som faktisk oppgir utstillingsperioder. De
+    # bruker samme oppsett: bloggliste med dato i brødteksten, så «krev_periode»
+    # holder publiseringsdatoene ute.
+    {
+        "id": "mosskunstforening", "region": "oslo", "navn": "Moss Kunstforening",
+        "kategori": "kunstforening", "bydel": "Moss",
+        "url": "https://www.mosskunstforening.no/",
+        "adresse": "Chrysties gate 1, 1530 Moss", "lat": 59.4349, "lon": 10.66284,
+        "sider": ["https://www.mosskunstforening.no/utstillinger"],
+        "element": "article, .post, .card, .entry, li.post, .elementor-post",
+        "tittel": "h2|h3|.entry-title|.elementor-post__title",
+        "dato": "time|.date|.entry-date|p|self",
+        "detalj": True, "krev_periode": True, "maks": 20,
+    },
+    {
+        "id": "heimdalkunstforening", "region": "midt", "navn": "Heimdal Kunstforening",
+        "kategori": "kunstforening", "bydel": "Heimdal",
+        "url": "https://heimdalkunstforening.no/",
+        "adresse": "Lundemobakken 1, 7072 Heimdal", "lat": 63.35222, "lon": 10.35884,
+        "element": "article, .post, .card, .entry, li.post, .elementor-post",
+        "tittel": "h2|h3|.entry-title|.elementor-post__title",
+        "dato": "time|.date|.entry-date|p|self",
+        "detalj": True, "krev_periode": True, "maks": 20,
+    },
+    {
+        "id": "kunstverket", "region": "oslo", "navn": "Kunstverket Galleri",
+        "kategori": "galleri", "bydel": "Ensjø",
+        "url": "https://www.kunstverket.no/",
+        "adresse": "Bråtenalléen 8B, 0487 Oslo", "lat": 59.94836, "lon": 10.78576,
+        "sider": ["https://www.kunstverket.no/utstillinger"],
+        "element": "article, .post, .card, .entry, li.post",
+        "tittel": "h2|h3|.entry-title|.card-title",
+        "dato": "time|.date|.card-body|p|self",
+        "detalj": True, "krev_periode": True, "maks": 20,
+    },
+    {
+        "id": "mrkunstsenter", "region": "vestlandet", "navn": "Møre og Romsdal Kunstsenter",
+        "kategori": "kunsthall", "bydel": "Molde",
+        "url": "https://www.mrkunst.no/",
+        "adresse": "Gørvellplassen 1, 6413 Molde", "lat": 62.73629, "lon": 7.15574,
+        "element": "article, .post, .card, .entry, li.post, .elementor-post",
+        "tittel": "h2|h3|.entry-title|.elementor-post__title",
+        "dato": "time|.date|.entry-date|p|self",
+        "detalj": True, "krev_periode": True, "maks": 20,
+    },
 ]
 
 

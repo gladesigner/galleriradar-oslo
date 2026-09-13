@@ -194,7 +194,16 @@ def tolk_periode(tekst: str | None, hint_ar: int | None = None) -> tuple[str | N
         if apen_start or apen_hale:
             return d, None
         return d, d
-    return datoer[0].isoformat(), datoer[-1].isoformat()
+    start, slutt = datoer[0], datoer[-1]
+    if slutt < start:
+        # Står årstallet bare bak den siste datoen, har den første fått årets
+        # årstall. «October 21 — October 26 2025» hører til samme år.
+        paa_nytt = _finn_datoer(t, hint_ar=slutt.year)
+        if len(paa_nytt) >= 2 and paa_nytt[0] <= paa_nytt[-1]:
+            start, slutt = paa_nytt[0], paa_nytt[-1]
+        else:
+            start, slutt = slutt, start
+    return start.isoformat(), slutt.isoformat()
 
 
 def datostart(tekst: str | None) -> int | None:

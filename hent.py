@@ -415,6 +415,17 @@ ARRANGEMENTSORD = re.compile(
     re.IGNORECASE)
 
 
+# Overskrifter som aldri er en utstilling. Små nettsteder blander
+# medlemsinformasjon og delingsknapper inn i det samme oppsettet.
+TITTEL_SOPPEL = re.compile(
+    r"^(bli medlem|medlemskap|velkommen|del dette|galleri|kontakt|om oss|"
+    r"\u00e5pningstider|forsiden|hjem|meny|les mer|nyheter|arkiv|søk|"
+    r"personvern|cookies|informasjonskapsler|abonner|nyhetsbrev|styret|"
+    r"utstillingsprogram|utstillingene|kalender|billetter|besøk|"
+    r"vedtekter|historie|utstillinger|arrangementer|program)\b",
+    re.IGNORECASE)
+
+
 def _er_arrangement(type_: str, tittel: str) -> bool:
     """Et enkeltarrangement skjer på et klokkeslett, en utstilling står en periode."""
     if type_ and type_ != "utstilling":
@@ -563,6 +574,11 @@ def _rydd(t: dict, kilde: dict) -> dict | None:
             r"pågående|fast utstilling|permanent|løpende|ongoing",
             f"{t.get('merkelapp', '')} {dato_tekst}", re.IGNORECASE):
         slutt = None
+
+    # Søppelsjekken kommer etter detaljsiden: kilder som henter tittelen
+    # derfra har gjerne «Les mer» i listen.
+    if TITTEL_SOPPEL.match(tittel):
+        return None
 
     if kilde.get("krev_dato") and not (start or slutt):
         return None
