@@ -26,6 +26,8 @@ struct Utstilling: Codable, Identifiable, Hashable {
     let periode: String?
     let startDato: String?
     let sluttDato: String?
+    let fraTid: String?
+    let tilTid: String?
     let url: String
     let bilde: String?
     let sammendrag: String?
@@ -42,6 +44,8 @@ struct Utstilling: Codable, Identifiable, Hashable {
         case kildeId = "kilde_id"
         case startDato = "start_dato"
         case sluttDato = "slutt_dato"
+        case fraTid = "fra_tid"
+        case tilTid = "til_tid"
         case forsteGang = "forste_gang"
     }
 
@@ -59,6 +63,12 @@ struct Utstilling: Codable, Identifiable, Hashable {
 
     var start: Date? { Dato.fra(startDato) }
     var slutt: Date? { Dato.fra(sluttDato) }
+
+    /// Starttidspunktet med klokkeslett, når kilden oppgir et. Brukes til
+    /// kalenderforslaget – et arrangement kl. 13 skal ikke bli en heldagspost.
+    var starttidspunkt: Date? { Dato.medKlokke(startDato, fraTid) }
+    var slutttidspunkt: Date? { Dato.medKlokke(startDato, tilTid) }
+    var harKlokkeslett: Bool { starttidspunkt != nil }
 
     /// Antall dager til siste dag. Nil når utstillingen ikke har sluttdato.
     func dagerIgjen(fra i_dag: Date = Date()) -> Int? {
@@ -137,6 +147,15 @@ enum Dato {
     }
 
     static func tekst(_ dato: Date) -> String { format.string(from: dato) }
+
+    /// «2026-09-13» + «13:00» → tidspunktet på den dagen.
+    static func medKlokke(_ dag: String?, _ klokke: String?) -> Date? {
+        guard let dag = fra(dag), let klokke, klokke.count == 5 else { return nil }
+        let deler = klokke.split(separator: ":").compactMap { Int($0) }
+        guard deler.count == 2 else { return nil }
+        return Calendar.current.date(bySettingHour: deler[0], minute: deler[1],
+                                     second: 0, of: dag)
+    }
 
     /// «2026-09-12T18:25:45» → «12. september kl. 18.25»
     static func lesbart(_ tidspunkt: String) -> String {

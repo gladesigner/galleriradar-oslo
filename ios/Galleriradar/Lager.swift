@@ -148,7 +148,11 @@ final class Lager: ObservableObject {
             liste = valgte.filter {
                 $0.erArrangement && ($0.startDato ?? "") >= iDag && ($0.startDato ?? "") <= om_en_maaned
             }
-            liste.sort { ($0.startDato ?? "") < ($1.startDato ?? "") }
+            // Samme dag avgjør klokkeslettet; det som mangler tid stilles sist.
+            liste.sort {
+                ($0.startDato ?? "", $0.fraTid ?? "99:99")
+                    < ($1.startDato ?? "", $1.fraTid ?? "99:99")
+            }
         case .nytt:
             // nettopp åpnet, og fortsatt oppe
             liste = utstillinger.filter { erNy($0) && ($0.sluttDato == nil || $0.sluttDato! >= iDag) }

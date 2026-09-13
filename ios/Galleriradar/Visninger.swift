@@ -339,10 +339,19 @@ struct DetaljVisning: View {
                 }
                 let hendelse = EKEvent(eventStore: arkiv)
                 hendelse.title = "\(utstilling.tittel) – \(utstilling.galleri)"
-                hendelse.isAllDay = true
-                let fra = utstilling.start ?? utstilling.slutt ?? Date()
-                hendelse.startDate = fra
-                hendelse.endDate = utstilling.slutt ?? fra
+                if let fra = utstilling.starttidspunkt {
+                    // Oppgir galleriet klokkeslett, settes det av i kalenderen
+                    // som en vanlig avtale. Uten sluttid regner vi en time.
+                    hendelse.isAllDay = false
+                    hendelse.startDate = fra
+                    hendelse.endDate = utstilling.slutttidspunkt
+                        ?? fra.addingTimeInterval(60 * 60)
+                } else {
+                    hendelse.isAllDay = true
+                    let fra = utstilling.start ?? utstilling.slutt ?? Date()
+                    hendelse.startDate = fra
+                    hendelse.endDate = utstilling.slutt ?? fra
+                }
                 hendelse.location = adresse
                 hendelse.notes = [utstilling.kunstnere, utstilling.sammendrag, utstilling.url]
                     .compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: "\n\n")

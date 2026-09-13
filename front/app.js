@@ -179,6 +179,11 @@
     const banner = visning === 'nytt'
       ? `<div class="beskjed"><span>${liste.length} ${liste.length === 1 ? 'ny utstilling' : 'nye utstillinger'}
            åpnet de siste sju dagene</span></div>` : '';
+    const banner2 = visning === 'arrangement'
+      ? `<div class="beskjed"><span>${liste.length} ${liste.length === 1 ? 'arrangement' : 'arrangementer'}
+           den kommende måneden – det som skjer først står øverst</span></div>` : '';
+    const banner3 = visning === 'fast'
+      ? '<div class="beskjed"><span>Faste utstillinger. De står uten sluttdato.</span></div>' : '';
     innhold.innerHTML = banner + banner2 + banner3 + `<div class="rutenett">${liste.map(kort).join('')}</div>`;
   }
 

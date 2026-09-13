@@ -31,7 +31,7 @@ from bs4 import BeautifulSoup
 # Vi ber derfor alltid om IPv4.
 _tilkobling.allowed_gai_family = lambda: socket.AF_INET
 
-from datotolk import datostart, tolk_periode
+from datotolk import datostart, tolk_klokkeslett, tolk_periode
 
 HODER = {
     "User-Agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -461,18 +461,43 @@ def _cache():
     k.execute("""CREATE TABLE IF NOT EXISTS detalj (
                      url TEXT PRIMARY KEY, hentet REAL,
                      dato_tekst TEXT, bilde TEXT, sammendrag TEXT, tittel TEXT)""")
+    try:                                  # eldre mellomlager mangler klokkeslettet
+        k.execute("ALTER TABLE detalj ADD COLUMN tid_tekst TEXT")
+    except sqlite3.OperationalError:
+        pass
     return k
+
+
+# Et klokkeslett telles bare når siden selv merker det som et tidspunkt –
+# «kl. 18.30» eller «Tid: 11:00 to 14:00». Løse tall som «12:00 – 16:00»
+# er som oftest åpningstidene til huset, ikke arrangementet.
+_RE_TID_MERKE = re.compile(
+    r"\bkl\b\.?\s*\d{1,2}(?:[:.]\d{2})?(?:\s*(?:[-–—]|til)\s*\d{1,2}(?:[:.]\d{2})?)?"
+    r"|\b(?:tid|time|klokkeslett|when)\b\s*[:.]?\s*\d{1,2}[:.]\d{2}"
+    r"(?:\s*(?:[-–—]|til|to)\s*\d{1,2}[:.]\d{2})?"
+    # «6.30 – 9 pm» er merket godt nok av am/pm alene.
+    r"|\d{1,2}(?:[:.]\d{2})?\s*(?:[-–—]|til|to)?\s*\d{0,2}(?:[:.]\d{2})?\s*[ap]\.?m\.?\b",
+    re.IGNORECASE)
+
+
+def _finn_tid(sup) -> str:
+    """Første merkede klokkeslett i brødteksten. Bunntekst og meny er alt
+    fjernet, så åpningstidene til galleriet står sjelden igjen."""
+    brod = _tekst(sup.select_one("main") or sup.body or sup)[:6000]
+    m = _RE_TID_MERKE.search(brod)
+    return m.group(0)[:60] if m else ""
 
 
 def hent_detalj(url: str, kilde: dict) -> dict:
     """Henter datoer/bilde/ingress fra utstillingens egen side. Mellomlagres."""
     k = _cache()
     try:
-        rad = k.execute("SELECT hentet, dato_tekst, bilde, sammendrag, tittel FROM detalj WHERE url=?",
-                        (url,)).fetchone()
+        rad = k.execute("SELECT hentet, dato_tekst, bilde, sammendrag, tittel, tid_tekst "
+                        "FROM detalj WHERE url=?", (url,)).fetchone()
         levetid = 14 * 86400 if (rad and rad[1]) else 2 * 86400
         if rad and time.time() - rad[0] < levetid:
-            return {"dato_tekst": rad[1], "bilde": rad[2], "sammendrag": rad[3], "tittel": rad[4]}
+            return {"dato_tekst": rad[1], "bilde": rad[2], "sammendrag": rad[3],
+                    "tittel": rad[4], "tid_tekst": rad[5]}
         try:
             r = hent_side(url, forsok=1, hoder=kilde.get("hoder"),
                           reserve=kilde.get("reserve", False),
@@ -499,6 +524,7 @@ def hent_detalj(url: str, kilde: dict) -> dict:
                 if start_ and not enkel:
                     enkel = bit
             dato_tekst = dato_tekst or enkel
+        tid_tekst = _finn_tid(sup)
         bilde = ""
         og = sup.find("meta", property="og:image")
         if og and og.get("content", "").strip():
@@ -519,11 +545,11 @@ def hent_detalj(url: str, kilde: dict) -> dict:
         sammendrag = _rens(beskr.get("content", "")) if beskr else ""
         ot = sup.find("meta", property="og:title")
         tittel = _rens(ot.get("content", "")) if ot else _rens(sup.title.string if sup.title else "")
-        k.execute("INSERT OR REPLACE INTO detalj VALUES (?,?,?,?,?,?)",
-                  (url, time.time(), dato_tekst, bilde, sammendrag, tittel))
+        k.execute("INSERT OR REPLACE INTO detalj VALUES (?,?,?,?,?,?,?)",
+                  (url, time.time(), dato_tekst, bilde, sammendrag, tittel, tid_tekst))
         k.commit()
-        return {"dato_tekst": dato_tekst, "bilde": bilde,
-                "sammendrag": sammendrag, "tittel": tittel}
+        return {"dato_tekst": dato_tekst, "bilde": bilde, "sammendrag": sammendrag,
+                "tittel": tittel, "tid_tekst": tid_tekst}
     finally:
         k.close()
 
@@ -545,6 +571,11 @@ def _rydd(t: dict, kilde: dict) -> dict | None:
             return None
     dato_tekst = _rens(t.get("dato_tekst", ""))
     start, slutt = tolk_periode(dato_tekst, t.get("ar_hint"))
+    detalj_dato = ""
+    mine_type = _type(t.get("merkelapp", ""), kilde.get("type", "utstilling"))
+    arrangement = _er_arrangement(mine_type, tittel)
+    fra_tid, til_tid = tolk_klokkeslett(dato_tekst) if arrangement else (None, None)
+
     url = t.get("url", "") or kilde["url"]
     bilde = t.get("bilde", "")
     sammendrag = _rens(t.get("sammendrag", ""))
@@ -553,20 +584,26 @@ def _rydd(t: dict, kilde: dict) -> dict | None:
     # eller tittel. Svaret mellomlagres, så det koster lite.
     trenger_periode = kilde.get("krev_periode") and not (start and slutt and start != slutt)
     mangler = (not (start or slutt)) or (not bilde) or trenger_periode \
-        or kilde.get("tittel_fra_detalj")
+        or kilde.get("tittel_fra_detalj") or (arrangement and not fra_tid)
     if kilde.get("detalj") and url.startswith("http") and mangler:
         d = hent_detalj(url, kilde)
         if kilde.get("tittel_fra_detalj") and d.get("tittel"):
             tittel = d["tittel"].split(" | ")[0].split(" - ")[0].strip() or tittel
         if d.get("dato_tekst"):
-            ny_start, ny_slutt = tolk_periode(_rens(d["dato_tekst"]), t.get("ar_hint"))
+            detalj_dato = _rens(d["dato_tekst"])
+            ny_start, ny_slutt = tolk_periode(detalj_dato, t.get("ar_hint"))
             # Detaljsiden vinner når den har en ekte periode, eller når listen
             # ikke ga noen dato i det hele tatt.
             if (ny_start and ny_slutt and ny_start != ny_slutt) or not (start or slutt):
-                dato_tekst = _rens(d["dato_tekst"])
+                dato_tekst = detalj_dato
                 start, slutt = ny_start, ny_slutt
         bilde = bilde or d.get("bilde", "")
         sammendrag = sammendrag or d.get("sammendrag", "")
+        if arrangement and not fra_tid:
+            for bit in (detalj_dato, d.get("tid_tekst") or ""):
+                fra_tid, til_tid = tolk_klokkeslett(bit)
+                if fra_tid:
+                    break
 
     # «Pågående utstilling» og «Fast utstilling» har bare én dato på siden –
     # åpningsdagen. Da står den inntil videre, ikke bare den ene dagen.
@@ -592,7 +629,10 @@ def _rydd(t: dict, kilde: dict) -> dict | None:
         if i is not None and i > 3:
             tittel = re.sub(r"\s+", " ", tittel[:i]).strip(" –—-,:·|") or tittel
     kunstnere = _uten_gjentakelse(_rens(t.get("kunstnere", "")), tittel)
-    mine_type = _type(t.get("merkelapp", ""), kilde.get("type", "utstilling"))
+    # Tittelen kan ha blitt byttet ut med detaljsidens – da må vurderingen tas om.
+    arrangement = _er_arrangement(mine_type, tittel)
+    if not arrangement:
+        fra_tid, til_tid = None, None
     return {
         "kilde_id": kilde["id"],
         "galleri": kilde["navn"],
@@ -604,11 +644,13 @@ def _rydd(t: dict, kilde: dict) -> dict | None:
         "dato_tekst": dato_tekst[:200],
         "start_dato": start,
         "slutt_dato": slutt,
+        "fra_tid": fra_tid,
+        "til_tid": til_tid,
         "url": url,
         "bilde": (bilde or "")[:700],
         "sammendrag": sammendrag[:700],
         "type": mine_type,
-        "arrangement": _er_arrangement(mine_type, tittel),
+        "arrangement": arrangement,
         "nokkel": _nokkel(url, tittel),
     }
 

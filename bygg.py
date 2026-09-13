@@ -27,7 +27,7 @@ from datetime import date, datetime, timedelta
 import requests
 
 import bilder
-from datotolk import periodetekst
+from datotolk import periodetekst, tidstekst
 from hent import hent_kilde
 from kilder import KILDER
 
@@ -227,6 +227,9 @@ def bygg(utmappe: str, forrige_peker: str | None, side_url: str, emne: str | Non
     for r in rader:
         r["periode"] = periodetekst(r.get("start_dato"), r.get("slutt_dato"),
                                     r.get("dato_tekst") or "")
+        tid = tidstekst(r.get("fra_tid"), r.get("til_tid"))
+        if tid and r.get("start_dato"):
+            r["periode"] = f"{r['periode']} · kl. {tid}"
 
     from kilder import REGIONER
     data = {

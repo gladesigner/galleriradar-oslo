@@ -1,6 +1,6 @@
 /* Servicearbeider: gjør appen installerbar og lar den vise siste liste uten nett. */
-const CACHE = 'galleriradar-2';
-const GRUNNMUR = ['./', 'index.html', 'stil.css?v=2', 'app.js?v=2', 'ikon-192.png',
+const CACHE = 'galleriradar-3';
+const GRUNNMUR = ['./', 'index.html', 'stil.css?v=3', 'app.js?v=3', 'ikon-192.png',
                   'manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {

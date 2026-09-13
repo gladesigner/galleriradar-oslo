@@ -256,3 +256,75 @@ def periodetekst(start: str | None, slutt: str | None, fallback: str = "") -> st
     if start:
         return f"Fra {norsk_dato(start)}"
     return fallback
+
+
+# Klokkeslett. Utstillinger går fra dato til dato, men et arrangement varer
+# fra 13.00 til 13.30 – og det er den opplysningen man trenger for å rekke det.
+_SKILL_TID = r"(?:[-–—]|til|to)"
+_SUFFIKS = r"(a\.?m\.?|p\.?m\.?)?"
+# Med «kl.» foran godtar vi både «kl 18» og «kl. 18.30».
+_RE_TID_KL = re.compile(
+    r"\bkl\b\.?\s*(\d{1,2})(?:[:.](\d{2}))?\s*" + _SUFFIKS
+    + r"(?:\s*" + _SKILL_TID + r"\s*(\d{1,2})(?:[:.](\d{2}))?\s*" + _SUFFIKS + r")?",
+    re.IGNORECASE)
+# Uten «kl.» krever vi kolon: «12.09» er en dato, «12:09» er et klokkeslett.
+_RE_TID_KOLON = re.compile(
+    r"(?<![\d:.])(\d{1,2}):(\d{2})\s*" + _SUFFIKS
+    + r"(?:\s*" + _SKILL_TID + r"\s*(\d{1,2}):(\d{2})\s*" + _SUFFIKS + r")?(?![\d:])",
+    re.IGNORECASE)
+# «7 – 9 pm»: står am/pm bare bakerst, hører det til begge klokkeslettene.
+_RE_TID_AMPM_PAR = re.compile(
+    r"(?<![\d:.])(\d{1,2})(?:[:.](\d{2}))?()\s*" + _SKILL_TID
+    + r"\s*(\d{1,2})(?:[:.](\d{2}))?\s*(a\.?m\.?|p\.?m\.?)", re.IGNORECASE)
+# «6 pm» – engelsk uten minutter. am/pm må stå der.
+_RE_TID_AMPM = re.compile(
+    r"(?<![\d:.])(\d{1,2})(?:[:.](\d{2}))?\s*(a\.?m\.?|p\.?m\.?)"
+    r"(?:\s*" + _SKILL_TID + r"\s*(\d{1,2})(?:[:.](\d{2}))?\s*" + _SUFFIKS + r")?",
+    re.IGNORECASE)
+
+
+def _tid(time_: str | None, minutt: str | None, suffiks: str | None) -> str | None:
+    if time_ is None:
+        return None
+    t, m = int(time_), int(minutt or 0)
+    if suffiks:                       # «6:00pm» er 18:00, «12:30am» er 00:30
+        s = suffiks.lower().replace(".", "")
+        if t > 12:
+            return None
+        if s == "pm" and t < 12:
+            t += 12
+        elif s == "am" and t == 12:
+            t = 0
+    if t > 23 or m > 59:
+        return None
+    return f"{t:02d}:{m:02d}"
+
+
+def tolk_klokkeslett(tekst: str | None) -> tuple[str | None, str | None]:
+    """Returnerer (fra, til) som «HH:MM», eller (None, None).
+
+    Godtar «kl. 13», «kl 13.00–13.30», «13:00 — 13:30» og «6:00pm».
+    """
+    if not tekst:
+        return None, None
+    t = re.sub(r"\s+", " ", str(tekst))
+    for regex in (_RE_TID_KL, _RE_TID_KOLON, _RE_TID_AMPM_PAR, _RE_TID_AMPM):
+        for m in regex.finditer(t):
+            sfx1, sfx2 = m.group(3), m.group(6)
+            # «6 – 8 pm»: står am/pm bare bakerst, gjelder det begge.
+            fra = _tid(m.group(1), m.group(2), sfx1 or sfx2)
+            til = _tid(m.group(4), m.group(5), sfx2 or sfx1)
+            if not fra:
+                continue
+            if til and til == fra:
+                til = None
+            return fra, til
+    return None, None
+
+
+def tidstekst(fra: str | None, til: str | None) -> str:
+    """«13.00–13.30» – norsk skrivemåte med punktum."""
+    if not fra:
+        return ""
+    s = fra.replace(":", ".")
+    return f"{s}–{til.replace(':', '.')}" if til else s
